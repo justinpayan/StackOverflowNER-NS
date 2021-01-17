@@ -1,0 +1,428 @@
+import csv, datetime, json, os, random, re, sys
+import xml.etree.ElementTree as ET
+from so_twokenize import tokenize
+from collections import Counter, defaultdict
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import numpy as np
+
+from nltk.tokenize import sent_tokenize
+from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
+punkt_param = PunktParameters()
+abbreviation = ['u.s.a', 'fig', 'etc', 'eg', 'mr', 'mrs', 'e.g', 'no', 'vs', 'i.e']
+punkt_param.abbrev_types = set(abbreviation)
+sent_tokenizer = PunktSentenceTokenizer(punkt_param)
+
+
+def get_lines(filename):
+    with open(filename, 'r') as f:
+        for line in f.readlines():
+            yield line
+
+
+def is_same(qa, text):
+    # if len(qa) != len(text):
+    #     return False
+    try:
+        for idx, l in enumerate(text):
+            if l[0].startswith("CODE_BLOCK"):
+                if qa[idx][0] != "CODE_BLOCK":
+                    return False
+                else:
+                    # print("matching code blocks, continue")
+                    return True
+            # The tokenizer is so different from what was actually used, the best we can do is see if a majority of lines
+            # match. Because the qid matches anyway, this is probably good enough.
+            if qa[idx] is not None and len(l) == len(qa[idx]):
+                for local_idx, s in enumerate(l):
+                    # print(s.split("\t")[0])
+                    # print(qa[idx][local_idx])
+                    if qa[idx][local_idx] != s.split("\t")[0]:
+                        return False
+                return True
+    except:
+        return False
+
+
+def get_create_date(qid, text, from_xml_tokens):
+    # print(qid)
+    # print(qid in from_xml_tokens.keys())
+    # print(from_xml_tokens[qid])
+    qas = from_xml_tokens[qid]
+    # print(text)
+    for qa in qas:
+        # print(qa[1])
+        if is_same(qa[1], text):
+            return qa[0]
+    print("no match")
+    print("\n".join([" ".join([t.split("\t")[0] for t in sent]) for sent in text]))
+    print("\n")
+    print(qas)
+    print("\n\n")
+    if len(qas) > 0:
+        return qas[0][0]
+
+
+def create_json_elts(text, create_date, qid, start_id):
+    json_elts = []
+    curr_id = start_id
+    new_labels = set()
+
+    for l in text:
+        if not l[0].startswith("CODE_BLOCK"):
+            json_elts.append( {
+                "id": curr_id,
+                "sentence": " ".join([s.split("\t")[0] for s in l]),
+                "tag_sequence": " ".join([s.split("\t")[1] for s in l]),
+                "creation_date": create_date.strftime("%Y-%m-%d"),
+                "question_id": qid
+            }
+            )
+            curr_id += 1
+
+            for label in [s.split("\t")[1] for s in l]:
+                new_labels.add(label)
+    return json_elts, new_labels, curr_id
+
+
+def load_xml_dump(xml_dump_dir):
+    from_xml_tokens = defaultdict(list)
+    skipped_sentences = 0
+    nonskipped_sentences = 0
+    for idx, file in enumerate(os.listdir(xml_dump_dir)):
+        # if idx % 1 == 0:
+        print(float(idx) / len(os.listdir(xml_dump_dir)))
+        lines = list(get_lines(os.path.join(xml_dump_dir, file)))
+        qid = lines[0].strip().split(" ")[-1].split("_")[0]
+        creation_date = datetime.datetime.strptime(lines[2][:10], "%Y-%m-%d")
+        text = []
+        # print("STARTING TOKENIZING:")
+        # print(lines[4:])
+        # print("END.")
+        # print("year: %d" % creation_year)
+        # print()
+        # print(lines)
+        for l in lines[4:]:
+            try:
+                text.append(tokenize(l))
+            except Exception as e:
+                print(e)
+                print(qid)
+                print(l)
+                skipped_sentences += 1
+                text.append(None)
+        if len([t for t in text if t is not None]) > 0:
+            from_xml_tokens[qid].append([creation_date, text])
+            nonskipped_sentences += len(text)
+        # print(from_xml_tokens[qid])
+
+        # print(from_xml_tokens[qid])
+        # print("\n\n")
+
+    print("done loading in xml dump")
+    return from_xml_tokens, skipped_sentences, nonskipped_sentences
+
+
+def construct_time_based_dataset(from_xml_tokens, labeled_data_file, out_base, label_set, start_id, sentence_ct,
+                                 skipped_annotated):
+    # Load in the full lines... store as a map from qid to a list of q's or a's, each of which is a list of lines
+    lists_of_posts = defaultdict(list)
+    qid = None
+    lines = get_lines(labeled_data_file)
+    for l in lines:
+        if get_first(l).lower() in ['question_id', 'answer_to_question_id']:
+            next(lines)
+            qid = next(lines).strip().split("\t")[0]
+            lists_of_posts[qid].append([])
+        elif get_first(l).lower() == 'question_url':
+            next(lines)
+            next(lines)
+        elif len(l.strip()) > 0:
+            single_sent = [l]
+            n = next(lines)
+            while len(n.strip()) > 0:
+                single_sent.append(n)
+                n = next(lines)
+            lists_of_posts[qid][-1].append(single_sent)
+
+    print("done loading in annotated data")
+
+    data_splits = [[], [], [], [], []]
+
+    # determine date cutoffs for each split, print them out.
+    # amount_per_split = sum([sum([len(text) for text in qid]) for qid in lists_of_posts])/5
+    # all_create_dates = []
+    # for qid in lists_of_posts:
+    #     for text in lists_of_posts[qid]:
+    #         create_date = get_create_date(qid, text, from_xml_tokens)
+    #         if create_date is not None:
+    #             all_create_dates.append(create_date)
+    # amount_per_split = len(all_create_dates)//5
+    # cutoffs = []
+    # all_create_dates = sorted(all_create_dates)
+    # for i in range(4):
+    #     cutoffs.append(all_create_dates[(i+1)*amount_per_split])
+    # cutoffs.append(datetime.datetime.strptime("2050-01-01", "%Y-%m-%d"))
+
+    # print(cutoffs)
+
+    # cutoffs determined using code above, for training data:
+    cutoffs = [datetime.datetime(2012, 6, 27, 0, 0),
+               datetime.datetime(2014, 3, 14, 0, 0),
+               datetime.datetime(2015, 6, 28, 0, 0),
+               datetime.datetime(2016, 10, 2, 0, 0),
+               datetime.datetime(2050, 1, 1, 0, 0)]
+
+    curr_id = start_id
+    for qid in lists_of_posts:
+        for text in lists_of_posts[qid]:
+            # text is a list of lists
+            # print("getting create date for qid %s with text %s\n" % (qid, str(text)))
+            create_date = get_create_date(qid, text, from_xml_tokens)
+            # print(create_date)
+            # print("\n\n")
+            if create_date is not None:
+                for i in range(5):
+                    if create_date < cutoffs[i]:
+                        which_split = i
+                        break
+
+                json_elts, new_labels, curr_id = create_json_elts(text, create_date, qid, curr_id)
+                data_splits[which_split].extend(json_elts)
+                label_set |= new_labels
+                sentence_ct += len(text)
+            else:
+                # print(text)
+                skipped_annotated += len(text)
+
+    # Go through lists_of_posts, matching them up with things we loaded in from the xml_dump files, then assign
+    # to the correct dict... these can be directly written out as
+
+    if labeled_data_file[-7:] == "dev.txt":
+        for idx, split in enumerate(data_splits):
+            with open(out_base + "_%d.json" % (idx+1), 'r') as f:
+                train_data_split = json.load(f)
+            d_split = train_data_split + data_splits[idx]
+            with open(out_base + "_%d.json" % (idx+1), 'w') as f:
+                json.dump(d_split, f)
+    else:
+        for idx, split in enumerate(data_splits):
+            with open(out_base + "_%d.json" % (idx+1), 'w') as f:
+                json.dump(data_splits[idx], f)
+
+    return curr_id, sentence_ct, skipped_annotated, label_set
+
+
+def create_sample_tr_test_space(xml_dump_file):
+    etree = ET.parse(xml_dump_file)
+    root = etree.getroot()
+    print(len(root))
+    examples = []
+    for row in root:
+        print('next:')
+        text = row.attrib["Body"]
+        examples.append(text)
+        print(tokenize(text))
+
+
+def get_first(line):
+    return line.strip().split("\t")[0]
+
+
+def get_qids_of_interest(labeled_data_files, lists_of_posts_loc):
+    lists_of_posts = defaultdict(list)
+    qid = None
+    for f in labeled_data_files:
+        lines = get_lines(f)
+        for l in lines:
+            if get_first(l).lower() in ['question_id', 'answer_to_question_id']:
+                next(lines)
+                qid = next(lines).strip().split("\t")[0]
+                lists_of_posts[qid].append([])
+            elif get_first(l).lower() == 'question_url':
+                next(lines)
+                next(lines)
+            elif len(l.strip()) > 0:
+                single_sent = [get_first(l)]
+                n = next(lines)
+                while len(n.strip()) > 0:
+                    single_sent.append(get_first(n))
+                    n = next(lines)
+                lists_of_posts[qid][-1].append(single_sent)
+    with open(lists_of_posts_loc, "w") as f:
+        json.dump(lists_of_posts, f)
+
+
+def count_entities(data):
+    entity_cts = Counter()
+    for d in data:
+        for t in d["tag_sequence"].strip().split(" "):
+            if t.startswith("B-"):
+                entity_cts[t[2:]] += 1
+    return entity_cts
+
+
+def get_entity_list():
+    data_loc = "/Users/juspayan/Downloads/so_with_code_blocks"
+
+    entity_list = set()
+    for episode in range(1, 6):
+        # for train_test in ["train", "test"]:
+        for train_test in ["train"]:
+            with open(os.path.join(data_loc, "so_%s_%d.json" % (train_test, episode)), 'r') as f:
+                data = json.load(f)
+            entity_cts = count_entities(data)
+            total = sum(entity_cts.values())
+            for i in entity_cts:
+                if float(entity_cts[i]) / total > 0.05:
+                    entity_list.add(i)
+    return sorted(list(entity_list))
+
+
+def plot_entity_pie(entity_cts, episode, train_test, sorted_entities, entity_colors):
+    plt.figure(figsize=(8, 8))
+    ax = plt.subplot()
+
+    total = sum(entity_cts.values())
+    # sorted_entities = sorted([i for i in entity_cts if float(entity_cts[i])/total > 0.01])
+    # sorted_entities = sorted([i for i in entity_cts])
+
+    sizes = [100*float(entity_cts[i])/total for i in sorted_entities]
+    sorted_entities = [i for i in sorted_entities]
+    sorted_entities.append("Other Entities")
+    sizes.append(100-sum(sizes))
+
+    ax.pie(sizes, colors=[entity_colors[i] for i in sorted_entities], autopct='%1.1f%%')
+    ax.axis('equal')
+
+    plt.tight_layout(pad=15)
+    train_test = "T" + train_test[1:]
+    plt.title("%s Ep. %d" % (train_test, episode))
+    name = "so_entity_pie_%d_%s" % (episode, train_test)
+    plt.savefig("/Users/juspayan/plots/%s.png" % name)
+    plt.clf()
+
+
+def plot_all_entity_pies():
+    entity_list = get_entity_list()
+
+    random.seed(15)
+    all_colors = sorted(mcolors.CSS4_COLORS, key=lambda x: random.random())
+
+    entity_colors = {entity_list[i]: all_colors[i] for i in range(len(entity_list))}
+    entity_colors["Other Entities"] = all_colors[len(entity_list)]
+    print("entity_colors")
+    print(entity_colors)
+
+    data_loc = "/Users/juspayan/Downloads/so_with_code_blocks"
+    for episode in range(1, 6):
+        for train_test in ["train", "test"]:
+            with open(os.path.join(data_loc, "so_%s_%d.json" % (train_test, episode)), 'r') as f:
+                data = json.load(f)
+            entity_cts = count_entities(data)
+            # sorted_entities = sorted(list(entity_cts.keys()))
+            plot_entity_pie(entity_cts, episode, train_test, entity_list, entity_colors)
+
+
+def plot_average_percent_over_episodes(up_or_down, entities, train_test, entity_to_percentage_of_ep_1):
+    avgs = [0.0]*5
+    for e in entities:
+        for idx, p in enumerate(entity_to_percentage_of_ep_1[e]):
+            avgs[idx] += p
+    for i in range(5):
+        avgs[i] /= len(entities)
+
+    # make the plot
+    plt.figure(figsize=(5, 4))
+    ax = plt.subplot()
+
+    plt.plot(range(1, 6), avgs)
+
+    ax.set_xlim([0, 6])
+    plt.xticks(range(1, 6))
+    plt.title("Percent of ep 1 over eps (%s %s)" % (up_or_down, train_test))
+    ax.set_ylabel("Average percent of ep 1")
+
+    ax.legend()
+    plt.tight_layout()
+    name = "percent_of_ep_1_%s_%s" % (up_or_down, train_test)
+    plt.savefig("/Users/juspayan/plots/%s.png" % name)
+
+
+def plot_percentage_change_over_episodes():
+    data_loc = "/Users/juspayan/Downloads"
+    for train_test in ["train", "test"]:
+        entity_percent_by_episode = defaultdict(list)
+        for episode in range(1, 6):
+            with open(os.path.join(data_loc, "so_%s_%d.json" % (train_test, episode)), 'r') as f:
+                data = json.load(f)
+            entity_cts = count_entities(data)
+            total = sum(entity_cts.values())
+            for e, c in entity_cts.items():
+                entity_percent_by_episode[e].append(float(c)/total)
+
+        entity_to_percentage_of_ep_1 = defaultdict(list)
+
+        for e in entity_percent_by_episode.keys():
+            percents = []
+            for p in entity_percent_by_episode[e]:
+                percents.append(100*p/entity_percent_by_episode[e][0])
+            entity_to_percentage_of_ep_1[e] = percents
+
+        # Get the entities that change at least 20% up or down by the end, and plot those over time
+        entities_up = set([e for e in entity_to_percentage_of_ep_1 if entity_to_percentage_of_ep_1[e][-1] > 120])
+        entities_down = set([e for e in entity_to_percentage_of_ep_1 if entity_to_percentage_of_ep_1[e][-1] < 80])
+
+        # entities_up = set([e for e in entity_to_percentage_of_ep_1 if entity_to_percentage_of_ep_1[e][-1] > 120 and
+        #                    sum(entity_cts_by_episode[e]) > 50])
+        # entities_down = set([e for e in entity_to_percentage_of_ep_1 if entity_to_percentage_of_ep_1[e][-1] < 80 and
+        #                      sum(entity_cts_by_episode[e]) > 50])
+
+        print("up: %s" % str(sorted(entities_up)))
+        print(100 * float(sum([entity_percent_by_episode[e][0] for e in entities_up])) /
+              float(sum([entity_percent_by_episode[e][0] for e in entity_percent_by_episode])))
+        print("down: %s" % str(sorted(entities_down)))
+        print(100 * float(sum([entity_percent_by_episode[e][0] for e in entities_down])) /
+              float(sum([entity_percent_by_episode[e][0] for e in entity_percent_by_episode])))
+
+        plot_average_percent_over_episodes("up", entities_up, train_test, entity_to_percentage_of_ep_1)
+        plot_average_percent_over_episodes("down", entities_down, train_test, entity_to_percentage_of_ep_1)
+
+
+def create_all_datasets():
+    xml_dump_dir = "/Users/juspayan/Downloads/text_files"
+    labeled_data_files = ["train.txt", "dev.txt", "test.txt"]
+    labeled_data_files = ["/Users/juspayan/Downloads/StackOverflowNER/resources/annotated_ner_data/StackOverflow/"
+                          + f_name for f_name in labeled_data_files]
+    out_bases = ["so_train", "so_train", "so_test"]
+    out_bases = ["/Users/juspayan/Downloads/" + out_base for out_base in out_bases]
+    # get_qids_of_interest(labeled_data_files, lists_of_posts_loc)
+
+    from_xml_tokens, skipped_sentences, nonskipped_sentences = load_xml_dump(xml_dump_dir)
+
+    curr_id = 0
+    label_set = set()
+    sentence_ct = 0
+    skipped_annotated = 0
+    for labeled_data_file, out_base in zip(labeled_data_files, out_bases):
+        curr_id, sentence_ct, skipped_annotated, label_set = construct_time_based_dataset(from_xml_tokens, labeled_data_file, out_base,
+                                                                       label_set, curr_id, sentence_ct, skipped_annotated)
+
+    print("Number of annotated sentences: %d" % sentence_ct)
+    print("Number of annotated sentences skipped: %d" % skipped_annotated)
+    print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
+    print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
+
+    label_map = {}
+    for idx, l in enumerate(label_set):
+        label_map[l] = idx
+
+    with open("/Users/juspayan/Downloads/so_labels", 'w') as labelf:
+        json.dump(label_map, labelf)
+
+
+if __name__ == "__main__":
+    # create_all_datasets()
+    plot_all_entity_pies()
+    # plot_percentage_change_over_episodes()
+
