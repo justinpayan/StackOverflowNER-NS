@@ -28,7 +28,7 @@ TURING_ARCHS = {'Tesla V100', '2080 Ti'}
 MODEL_CLASSES = {
     'gpt2': (GPT2Model, GPT2Tokenizer, GPT2Config),
     # 'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
-}
+}r
 SAVE_NAME = 'model-'
 FINAL_SAVE_NAME = 'model-finish'
 
@@ -158,11 +158,11 @@ def parse_args():
         special_tokens["ic"] = '__intent__'
 
     model_class, tokenizer_class, config_class = MODEL_CLASSES[args.model_name]
-    tokenizer = tokenizer_class.from_pretrained(os.path.join(args.model_base_dir, args.model_name))
+    tokenizer = tokenizer_class.from_pretrained(args.model_name)
     tokenizer.add_tokens(list(special_tokens.values()))
     special_token_ids = {k:tokenizer.convert_tokens_to_ids(v) for k,v in special_tokens.items()}
 
-    model_config = config_class.from_pretrained(os.path.join(args.model_base_dir, args.model_name))
+    model_config = config_class.from_pretrained(args.model_name)
     model_config.vocab_size = len(tokenizer)
     tokens_weight = torch.ones([model_config.vocab_size], dtype=torch.float).cuda()
     tokens_weight[special_token_ids["ans_token"]] = args.tokens_weight
