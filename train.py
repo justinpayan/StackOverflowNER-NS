@@ -98,7 +98,7 @@ def train(task_ids, model):
     if not args.fp32:  # again because resize_token_embeddings makes embedding layer fp32
         model = FP16_Module(model)
 
-    parallel_model = DataParallelModel(model, args.device_ids)
+    # parallel_model = DataParallelModel(model, args.device_ids)
 
     train_ner_data = NERDataset(train_dataset,
                                 "train", SPECIAL_TOKEN_IDS[tasks[0]], tasks[0], train_extra_data,
@@ -151,7 +151,7 @@ def train(task_ids, model):
     if args.seq_train_type in REG_TYPE_KEYS:
         copy_train_dataloader = create_dataloader(train_ner_data, "train", max_train_batch_size)
         prev_task = args.tasks[task_ids[0]-1]
-        regularizer = REG_TYPES[args.seq_train_type](model, parallel_model, [copy_train_dataloader], tasks[0], prev_task)
+        regularizer = REG_TYPES[args.seq_train_type](model, None, [copy_train_dataloader], tasks[0], prev_task)
         regularizer.task_start_do()
 
     tot_n_steps = 0
@@ -174,7 +174,8 @@ def train(task_ids, model):
                 gen_X[i] = (gen_X[i].to(args.device_ids[i]),)
                 gen_Y[i] = gen_Y[i].to(args.device_ids[i])
 
-            losses = get_losses(parallel_model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct)
+            # losses = get_losses(parallel_model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct)
+            losses = get_losses(model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct)
             loss = sum(losses)
             # if "gem" in args.seq_train_type and task_ids[0] != 0:
             #     gem_step(task_ids[0])
