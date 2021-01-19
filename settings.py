@@ -6,8 +6,8 @@ import datetime
 logger = logging.getLogger(__name__)
 
 import GPUtil
-from pytorch_transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
-from pytorch_transformers import GPT2Model, GPT2Tokenizer, GPT2Config, CONFIG_NAME
+# from transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
+from transformers import GPT2Model, GPT2Tokenizer, GPT2Config, CONFIG_NAME
 import torch
 
 import pathlib
@@ -27,7 +27,7 @@ MEMORY_FACTOR = {
 TURING_ARCHS = {'Tesla V100', '2080 Ti'}
 MODEL_CLASSES = {
     'gpt2': (GPT2Model, GPT2Tokenizer, GPT2Config),
-    'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
+    # 'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
 }
 SAVE_NAME = 'model-'
 FINAL_SAVE_NAME = 'model-finish'
