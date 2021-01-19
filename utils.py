@@ -709,7 +709,7 @@ def sample_sequence(model, need_process, ner_results, all_pasts, max_tot_lens):
 
                         past[layer_id] = torch.stack(past[layer_id], dim=1)
                     # logging.info("input_ids.shape: %s, past[0].shape: %s" % (str(input_ids.shape), str(past[0].shape)))
-                    all_gpt_outputs, new_pasts = lm(input_ids=input_ids.cuda(), past_key_values=past)
+                    all_gpt_outputs, new_pasts = lm(input_ids=input_ids.cuda(), past=past)
                 else:
                     all_gpt_outputs, new_pasts = lm(input_ids=input_ids.cuda())
 
