@@ -193,7 +193,7 @@ def train(task_ids, model):
                     cur_n_inputs/(n_steps + 1)
                 ))
 
-        torch.save(model.state_dict(), os.path.join(model_dir, SAVE_NAME+str(ep+1)))
+        # torch.save(model.state_dict(), os.path.join(model_dir, SAVE_NAME+str(ep+1)))
         tot_n_steps += (n_steps + 1)
         logger.info('epoch {}/{} done , tot steps {} , lr {:.1E} , loss {:.2f} , ner loss {:.2f} , lm loss {:.2f} , avg batch size {:.1f}'.format(
             ep+1, n_train_epochs, tot_n_steps, scheduler.get_lr(), cum_loss/cur_n_inputs, cum_ner_loss/cur_n_inputs, cum_lm_loss/cur_n_inputs, cur_n_inputs/(n_steps+1)
