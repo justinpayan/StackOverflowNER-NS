@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 from torch import nn
-from pytorch_transformers import AdamW
+from transformers import AdamW
 import csv
 import numpy as np
 import os
