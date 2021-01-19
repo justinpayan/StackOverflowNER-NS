@@ -1,7 +1,3 @@
-source activate pytorch_p36
-conda deactivate
-conda activate pytorch_p36
-
 LAM=$1
 LR=$2
 NUM_EPS=$3
