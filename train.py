@@ -1,6 +1,7 @@
 from transformers import AdamW
 from fp16 import FP16_Optimizer
 from model import *
+from parallel import DataParallelModel, DataParallelCriterion
 from utils import *
 from settings import args, TASK_DICT, init_logging, MODEL_CONFIG, MODEL_CLASS
 from settings import TOKENIZER, SPECIAL_TOKEN_IDS, FILL_VAL, FINAL_SAVE_NAME, TOKENS_WEIGHT, CONFIG_NAME, LABEL_MAP
@@ -35,6 +36,8 @@ def train(task_ids, model):
 
     if not args.fp32:  # again because resize_token_embeddings makes embedding layer fp32
         model = FP16_Module(model)
+
+    parallel_model = DataParallelModel(model, args.device_ids)
 
     train_ner_data = NERDataset(train_dataset,
                                 "train", SPECIAL_TOKEN_IDS[tasks[0]], tasks[0], train_extra_data,
@@ -79,13 +82,13 @@ def train(task_ids, model):
 
     scheduler = AnnealingLR(optimizer, start_lr=args.learning_rate, warmup_iter=int(args.n_warmup_ratio*len(train_ner_data)),
             num_iters=int(n_train_optimization_steps), decay_style=args.decay_style)
-    ner_loss_fct = CrossEntropyLoss(ignore_index=FILL_VAL)
-    lm_loss_fct = CrossEntropyLoss(ignore_index=FILL_VAL, weight=TOKENS_WEIGHT)
+    ner_loss_fct = DataParallelCriterion(CrossEntropyLoss(ignore_index=FILL_VAL), args.device_ids)
+    lm_loss_fct = DataParallelCriterion(CrossEntropyLoss(ignore_index=FILL_VAL, weight=TOKENS_WEIGHT), args.device_ids)
 
     if args.seq_train_type in REG_TYPE_KEYS:
         copy_train_dataloader = create_dataloader(train_ner_data, "train", max_train_batch_size)
         prev_task = args.tasks[task_ids[0]-1]
-        regularizer = REG_TYPES[args.seq_train_type](model, None, [copy_train_dataloader], tasks[0], prev_task)
+        regularizer = REG_TYPES[args.seq_train_type](model, parallel_model, [copy_train_dataloader], tasks[0], prev_task)
         regularizer.task_start_do()
 
     tot_n_steps = 0
@@ -104,7 +107,7 @@ def train(task_ids, model):
                 gen_X[i] = (gen_X[i].to(args.device_ids[i]),)
                 gen_Y[i] = gen_Y[i].to(args.device_ids[i])
 
-            losses = get_losses(model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct)
+            losses = get_losses(parallel_model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct)
             loss = sum(losses)
             train_once(loss, n_inputs)
 
