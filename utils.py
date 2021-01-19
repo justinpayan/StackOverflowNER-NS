@@ -48,28 +48,6 @@ def get_model_dir(tasks):
 
 def get_losses(model, ner_X, Y_train, gen_X, gen_Y, ner_loss_fct, lm_loss_fct):
     if "lll" in args.seq_train_type:
-        # logger.info(ner_X[0][0])
-        # logger.info(Y_train)
-
-        # def get_len(one_d_tensor):
-        #     l = 0
-        #     for i in one_d_tensor:
-        #         if i < 50258:
-        #             l += 1
-        #         else:
-        #             return l
-
-        # for i in range(ner_X[0][0].shape[0]):
-            # l = get_len(ner_X[0][0][i,:])
-            # logger.info(ner_X[0][0][i,:l])
-            # logger.info("ner_X: %s" % str(TOKENIZER.decode(ner_X[0][0][i,:].tolist())))
-            # logger.info("Y_train: %s" % str([INVERSE_LABEL_MAP[l] for l in Y_train[0][i,:].tolist()]))
-        #     logger.info("gen_X: %s" % str(TOKENIZER.decode(gen_X[0][i,:l+1].tolist())))
-        #     logger.info(gen_Y[0][i,:l+1].tolist())
-        #     logger.info("gen_Y: %s" % str(TOKENIZER.decode(gen_Y[0][i,:l+1].tolist())))
-        # logging.info("ner_X len: %s" % str(len(ner_X)))
-        # logging.info("ner_X[0][0].shape: %s" % str(ner_X[0][0].shape))
-        # logging.info("ner_X[0][0].type: %s" % str(ner_X[0][0].dtype))
         lm_logits = model.lm_forward(gen_X)
         lm_loss = lm_loss_fct([torch.transpose(l, 1, 2) for l in lm_logits], gen_Y)
         if args.use_crf:
@@ -106,25 +84,12 @@ def top_k_top_p_filtering(logits, top_k=0, top_p=0.0, filter_value=-float('Inf')
                 Nucleus filtering is described in Holtzman et al. (http://arxiv.org/abs/1904.09751)
         From: https://gist.github.com/thomwolf/1a5a29f6962089e871b94cbd09daf317
     """
-    # assert logits.dim() == 1  # batch size 1 for now - could be updated for more but the code would be less clear
     top_k = min(top_k, logits.size(-1))  # Safety check
     if top_k > 0:
         # Remove all tokens with a probability less than the last token of the top-k
         indices_to_remove = logits < torch.topk(logits, top_k)[0][..., -1, None]
         logits[indices_to_remove] = filter_value
 
-    # if top_p > 0.0:
-    #     sorted_logits, sorted_indices = torch.sort(logits, descending=True)
-    #     cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
-
-    #     # Remove tokens with cumulative probability above the threshold
-    #     sorted_indices_to_remove = cumulative_probs > top_p
-    #     # Shift the indices to the right to keep also the first token above the threshold
-    #     sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
-    #     sorted_indices_to_remove[..., 0] = 0
-
-    #     indices_to_remove = sorted_indices[sorted_indices_to_remove]
-    #     logits[indices_to_remove] = filter_value
     return logits
 
 
@@ -155,23 +120,6 @@ def dynamic_collate_fn(data, batch_size):
             pad_len = max_len - len(data[j][1])
             pad_len_gen = ner_max_len - len(data[j][5])
 
-            # logger.info("%s\n%s\n%s\n%s\n%s\n"
-            #             "%d\n%d\n%d\n%d" % (str(data[j][1]),
-            #                                 str(data[j][2]),
-            #                                 str(data[j][3]),
-            #                                 str(data[j][4]),
-            #                                 str(data[j][5]),
-            #                                 max_len,
-            #                                 pad_len,
-            #                                 len(data[j][1]),
-            #                                 len(data[j][3])))
-
-            # logger.info("ner_max_len: %d" % ner_max_len)
-            # logger.info("Y_max_len: %d" % Y_max_len)
-            # logger.info("padded 1: %d" % len(pad_to_max_len(data[j][1], max_len - len(data[j][1]), SPECIAL_TOKEN_IDS["pad_token"])))
-            # logger.info("padded 3: %d" % len(pad_to_max_len(data[j][3], Y_max_len - len(data[j][3]), FILL_VAL)))
-            # logger.info("padded 4: %d" % len(pad_to_max_len(data[j][4], pad_len, SPECIAL_TOKEN_IDS["pad_token"])))
-            # logger.info("padded 5: %d" % len(pad_to_max_len(data[j][5], pad_len, FILL_VAL)))
             _originals.append(data[j][0])
             _ner_Xs.append(pad_to_max_len(data[j][1], pad_len, SPECIAL_TOKEN_IDS["pad_token"]))
             _len_ner_Xs.append(data[j][2])
@@ -193,13 +141,7 @@ def dynamic_collate_fn(data, batch_size):
 
     for ed, datum in enumerate(data):
         ln = len(datum[5]) # use gen_X to calibrate
-        # logger.info("len data: %d" % len(data))
-        # logger.info("batch_size: %s" % batch_size)
-        # logger.info("cnt: %d" % cnt)
-        # logger.info(
-        #     "max(ner_max_len, ln)**LEN_FACTOR * (ed - st + 1): %0.4f" % max(ner_max_len, ln) ** LEN_FACTOR * (
-        #             ed - st + 1))
-        # if max(ner_max_len, ln)**LEN_FACTOR * (ed - st + 1) > batch_size[cnt]:
+
         if max(ner_max_len, ln)**LEN_FACTOR * (ed - st + 1) > batch_size[0]:
             local_collate()
             cnt += 1
@@ -339,19 +281,8 @@ class NERDataset(Dataset):
             ner_example = self.concat_example([], intent_token, encoded_sentence, [])
             Y_example_train = tag_sequence_train
 
-        # logging.info("ner_example: %s" % str(ner_example))
-        # logging.info("Y_example_train: %s" % str(Y_example_train))
-
         Y_example = tag_sequence
-        # Y_example = [self.label_map[l.strip()] for l in tag_sequence.split(" ")]
 
-        # if args.add_ent_tokens:
-        #     entity_tokens = self.sample_entity_tokens(tag_sequence)
-        #     gen_X_start = [gen_token] + entity_tokens + TOKENIZER.encode("__start__")
-        #     gen_Y_start = entity_tokens + TOKENIZER.encode("__start__")
-        # else:
-        #     gen_X_start = [gen_token]
-        #     gen_Y_start = []
         gen_X_start = [gen_token]
         gen_Y_start = []
 
@@ -379,12 +310,6 @@ class NERDataset(Dataset):
             original, encoded_sentence, tag_sequence, tag_sequence_train = \
                 tokenize_sentence_with_tags(d["sentence"], d["sentence"].split(" "), d["tag_sequence"].split(" "))
 
-        # original, encoded_sentence, tag_sequence, tag_sequence_train = self.tokenize_sentence_with_tags(d)
-        # logging.info("sentence and tag sequence before:\n%s\n%s\n"
-        #              "sentence and tag sequence after:\n%s\n%s" % (str(d["sentence"].split(" ")),
-        #                                                            str(d["tag_sequence"].split(" ")),
-        #                                                            str(encoded_sentence),
-        #                                                            str(tag_sequence)))
         id = d["id"]
         if args.ic:
             examples.append(self.parse_example(self.gen_token, "__%s__" % self.task_name, original,
@@ -417,14 +342,6 @@ class NERDataset(Dataset):
 
     def get_indices(self):
         return [d[-1] for d in self.data]
-
-    # def _sort_by_index(self,data):
-    #    datum = []
-    #    for d in data:
-    #        for qa in d["qas"]:
-    #            datum.append({"context":d["context"], "qas":[qa]})
-    #    datum.sort(key=lambda x:x["qas"][0]["id"])
-    #    return datum
 
     def __len__(self):
         return len(self.data)
@@ -647,8 +564,6 @@ def remove_id(idx, need_process, all_pasts):
 def sample_sequence(model, need_process, ner_results, all_pasts, max_tot_lens):
     lm = model.lm
     while len(need_process) > 0:
-        # logging.info("len(need_process): %d" % len(need_process))
-        # logging.info("need_process: %s" % str(need_process))
         first_id = next(iter(need_process))
         shortest_len = len(ner_results[first_id])
         decode_batch_size = int(args.memory_sizes[0] * MEMORY_FACTOR[args.seq_train_type] // (shortest_len+1)**LEN_FACTOR)
@@ -656,12 +571,10 @@ def sample_sequence(model, need_process, ner_results, all_pasts, max_tot_lens):
         stop = False
         remove_ids = []
         while not stop:
-            # batch_ids, input_ids, past = [], [], [[] for _ in range(MODEL_CONFIG.n_layer)]
             batch_ids, _input_ids, pasts = {}, {}, {}
             while True:
                 try:
                     cur_id = next(it)
-                    # logging.info("len(ner_results[cur_id]): %d, shortest_len: %d" % (len(ner_results[cur_id]), shortest_len))
                     if len(ner_results[cur_id]) > shortest_len:
                         stop = True
                         break
@@ -692,45 +605,20 @@ def sample_sequence(model, need_process, ner_results, all_pasts, max_tot_lens):
 
             for seq_len in batch_ids:
                 input_ids = torch.stack(_input_ids[seq_len])
-                # logging.info("seq_len: %d" % seq_len)
                 past = pasts[seq_len]
-                # logging.info("past: %s" % str(past))
-                # for idx, i in enumerate(past[0]):
-                #     logging.info("past[0][%d].shape: %s" % (idx, str(i.shape)))
+
                 if args.model_name == "gpt2":
                     for layer_id in range(MODEL_CONFIG.n_layer):
-                        # for tens in past[layer_id]:
-                        #     seq_len = tens.shape[2]
-                        #     if seq_len not in pasts_indexed_by_seq_len:
-                        #         pasts_indexed_by_seq_len[seq_len] = [[] for _ in range(MODEL_CONFIG.n_layer)]
-                        #     pasts_indexed_by_seq_len[seq_len][layer_id].append()
-                        #
-                        # logging.info("sequence lens in past: %s" % (str(pasts_indexed_by_seq_len.keys())))
 
                         past[layer_id] = torch.stack(past[layer_id], dim=1)
-                    # logging.info("input_ids.shape: %s, past[0].shape: %s" % (str(input_ids.shape), str(past[0].shape)))
                     all_gpt_outputs, new_pasts = lm(input_ids=input_ids.cuda(), past=past)
                 else:
                     all_gpt_outputs, new_pasts = lm(input_ids=input_ids.cuda())
 
-                # logging.info("input_ids.shape: %s" % str(input_ids.shape))
-                # logging.info("all_gpt_outputs.shape: %s" % str(all_gpt_outputs.shape))
-                # logging.info("len(pasts): %d" % len(pasts))
-                # for p in range(len(pasts)):
-                #     logging.info("pasts[%d].shape: %s" % (p, str(pasts[p].shape)))
-
                 outputs = model.lm_head(all_gpt_outputs)
-
-                # logging.info("outputs.shape: %s" % str(outputs))
-                # outputs = all_outputs[0]
-                # if args.model_name == "gpt2":
-                #     pasts = all_outputs[1]
 
                 next_logits = outputs[..., -1, :] / args.temperature_ner
                 next_tokens = logits_to_tokens(next_logits).cpu()
-
-                # logging.info("ner_results: %s" % str(ner_results))
-                # logging.info("next_tokens: %s" % str(next_tokens))
 
                 for i, cur_id in enumerate(batch_ids[seq_len]):
                     if next_tokens[i] == SPECIAL_TOKEN_IDS["eos_token"]:
