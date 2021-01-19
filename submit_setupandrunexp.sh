@@ -3,6 +3,7 @@
 OUTBASE=/mnt/nfs/scratch1/jpayan/Lamolrelease
 
 mkdir -p $OUTBASE/logs/train/lll
+mkdir -p $OUTBASE/logs/train/real
 mkdir -p $OUTBASE/logs/train/finetune
 
 #sbatch -J lll_so \
