@@ -37,6 +37,7 @@ def train(task_ids, model):
     if not args.fp32:  # again because resize_token_embeddings makes embedding layer fp32
         model = FP16_Module(model)
 
+    print("device_ids: ", args.device_ids)
     parallel_model = DataParallelModel(model, args.device_ids)
 
     train_ner_data = NERDataset(train_dataset,

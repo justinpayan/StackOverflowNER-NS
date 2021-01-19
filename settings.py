@@ -115,7 +115,9 @@ def parse_args():
     elif args.seq_train_type == "lll":
         args.model_dir_root += "_improvedgen"
 
-    args.device_ids = GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus)
+    # args.device_ids = GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus)
+    args.device_ids = [0]
+    # print(args.device_ids)
     if not args.browsing and len(args.device_ids) == 0:
         logger.error('No available GPUs!')
         raise NotImplementedError("No CPU mode available!")
