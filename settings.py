@@ -128,7 +128,7 @@ def parse_args():
     if not args.browsing:
         print(args.device_num)
         print(GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus))
-        torch.cuda.set_device(args.device_ids[args.device_num])
+        # torch.cuda.set_device(args.device_ids[args.device_num])
 
         gpus = GPUtil.getGPUs()
         # gpu_names = [gpus[device_id].name for device_id in args.device_ids]
