@@ -1,7 +1,3 @@
-source activate pytorch_p36
-conda deactivate
-conda activate pytorch_p36
-
 LAM=$1
 GEN_PER=$2
 LR=$3
@@ -22,8 +18,11 @@ python test.py --data_dir /efs-storage/data \
     --tasks $ORDER --n_train_epochs $NUM_EPS --top_k_lm 20 --top_k_ner 20 \
     --lm_lambda $LAM --gen_lm_sample_percentage $GEN_PER \
     --label_map_file /efs-storage/data/${LABEL_MAP_FILE_NAME} --logging_steps 100 \
-    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only --ic &
+    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only &
+#    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only --ic &
 
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "wnut conll_eng" wnut_conll_labels lll
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_episodes_dataset/so_labels lll
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_episodes_dataset/so_labels finetune
+
+# ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels lll

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 LAM=$1
 GEN_PER=$2
 LR=$3
