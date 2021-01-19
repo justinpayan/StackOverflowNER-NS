@@ -18,9 +18,9 @@
   "ask_ubuntu": {"train":  {"data_size": 53, "max_a_len": 2}, "eval":  {"data_size": 109, "max_a_len": 2}, "test":  {"data_size": 109, "max_a_len": 2}},
   "wnut": {"train":  {"data_size": 2394, "max_a_len": 2}, "eval":  {"data_size": 1000, "max_a_len": 2}, "test":  {"data_size": 3850, "max_a_len": 2}},
   "wnut_O": {"train":  {"data_size": 2394, "max_a_len": 2}, "eval":  {"data_size": 1000, "max_a_len": 2}, "test":  {"data_size": 3850, "max_a_len": 2}},
-  "so_1": {"train":  {"data_size": 2883, "max_a_len": 2}, "eval":  {"data_size": 923, "max_a_len": 2}, "test":  {"data_size": 923, "max_a_len": 2}},
-  "so_2": {"train":  {"data_size": 2935, "max_a_len": 2}, "eval":  {"data_size": 797, "max_a_len": 2}, "test":  {"data_size": 797, "max_a_len": 2}},
-  "so_3": {"train":  {"data_size": 2745, "max_a_len": 2}, "eval":  {"data_size": 637, "max_a_len": 2}, "test":  {"data_size": 637, "max_a_len": 2}},
-  "so_4": {"train":  {"data_size": 2993, "max_a_len": 2}, "eval":  {"data_size": 599, "max_a_len": 2}, "test":  {"data_size": 599, "max_a_len": 2}},
-  "so_5": {"train":  {"data_size": 2932, "max_a_len": 2}, "eval":  {"data_size": 788, "max_a_len": 2}, "test":  {"data_size": 788, "max_a_len": 2}}
+  "so_1": {"train":  {"data_size": 2267, "max_a_len": 2}, "eval":  {"data_size": 532, "max_a_len": 2}, "test":  {"data_size": 532, "max_a_len": 2}},
+  "so_2": {"train":  {"data_size": 2358, "max_a_len": 2}, "eval":  {"data_size": 600, "max_a_len": 2}, "test":  {"data_size": 600, "max_a_len": 2}},
+  "so_3": {"train":  {"data_size": 3134, "max_a_len": 2}, "eval":  {"data_size": 493, "max_a_len": 2}, "test":  {"data_size": 493, "max_a_len": 2}},
+  "so_4": {"train":  {"data_size": 2231, "max_a_len": 2}, "eval":  {"data_size": 792, "max_a_len": 2}, "test":  {"data_size": 792, "max_a_len": 2}},
+  "so_5": {"train":  {"data_size": 1499, "max_a_len": 2}, "eval":  {"data_size": 514, "max_a_len": 2}, "test":  {"data_size": 514, "max_a_len": 2}}
 }

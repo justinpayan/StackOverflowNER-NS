@@ -82,7 +82,7 @@ def train(task_ids, model):
 
     if not model:
         # which_model_to_load = model_dir if os.path.isfile(os.path.join(model_dir, FINAL_SAVE_NAME)) else args.model_name
-        lang_model = MODEL_CLASS.from_pretrained("/efs-storage/" + args.model_name).cuda()
+        lang_model = MODEL_CLASS.from_pretrained(os.path.join(args.model_base_dir, args.model_name)).cuda()
         lang_model.resize_token_embeddings(len(TOKENIZER))
         # if not args.fp32:
         #     model = FP16_Module(model)
