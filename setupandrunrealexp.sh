@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 LAM=$1
 LR=$2
 NUM_EPS=$3
