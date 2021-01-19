@@ -28,7 +28,7 @@ TURING_ARCHS = {'Tesla V100', '2080 Ti'}
 MODEL_CLASSES = {
     'gpt2': (GPT2Model, GPT2Tokenizer, GPT2Config),
     # 'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
-}r
+}
 SAVE_NAME = 'model-'
 FINAL_SAVE_NAME = 'model-finish'
 
