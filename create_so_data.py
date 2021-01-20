@@ -222,10 +222,11 @@ def construct_time_based_dataset(from_xml_tokens, labeled_data_file, out_base, l
 
 def create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, total_size):
     splits = [[], [], [], [], []]
+    selected_ids = set()
 
     ct = 0
     while sum([len(s) for s in splits]) < total_size:
-        if ct % 10000 == 0:
+        if ct % 1000 == 0:
             print(sum([len(s) for s in splits]))
             print(total_size)
         ct += 1
@@ -248,7 +249,7 @@ def create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, t
                             ("Code_Block" in t and ep > 1) or \
                             ("Data_Structure" in t and ep < 3):
                         return True
-                return False
+                return s["id"] in selected_ids
 
             # Draw one of the samples from there, and remove it
             for sample in entity_types_to_json_elts[entity_to_draw]:
@@ -256,6 +257,7 @@ def create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, t
                 if not is_forbidden(sample, episode):
                     splits[episode].append(sample)
                     entity_types_to_json_elts[entity_to_draw].remove(sample)
+                    selected_ids.add(sample["id"])
                     break
     return splits
 
@@ -343,13 +345,24 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
 
     # For each episode, sample from the entity type distribution, and then pull a sentence with that entity type.
     # Cycle through the episodes so we can get as close to the intended distribution as possible.
-    total_size = len(train_data) / 1.075
+    total_size = len(train_data) / 1.7
     train_splits = create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, total_size)
 
     # Save the train data
     for idx, split in enumerate(train_splits):
         with open(os.path.join(out_dir, "so_train_%d.json" % (idx + 1)), 'w') as f:
-            json.dump(split, f)
+            json.dump(sorted(split, key=lambda x: int(x["id"])), f)
+
+    # Save all the train data together, for running the baseline
+    # Need to re-aggregate since we may have dropped some items from the training set during sampling episodes
+    # Save 5 copies, so we can just pretend there are 5 training sets and 5 test sets for the code that
+    # expects episodes.
+    train_data = []
+    for split in train_splits:
+        train_data.extend(split)
+    for idx in range(len(train_splits)):
+        with open(os.path.join(out_dir, "so_train_all_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(sorted(train_data, key=lambda x: int(x["id"])), f)
 
     # Sample the test data according to a slightly perturbed version of the training data
     for ep in range(5):
@@ -358,7 +371,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     entity_distribs[0:3, data_structure_idx] = 0
     entity_distribs[2:, code_block_idx] = 0
 
-    total_size = len(test_data) / 1.075
+    total_size = len(test_data) / 1.7
     test_splits = create_splits(entity_types_to_json_elts_test, entity_distribs, sorted_entities, total_size)
 
     for idx, split in enumerate(test_splits):
@@ -588,6 +601,7 @@ if __name__ == "__main__":
     args = parse_args()
 
     random.seed(31415)
+    # np.default_rng is seeded at top
 
     create_all_datasets(args.xml_dump_dir, args.labeled_data_dir, args.json_dir)
     plot_all_entity_pies(args.json_dir)
