@@ -262,6 +262,17 @@ def create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, t
     return splits
 
 
+def create_uniform_splits(dset):
+    splits = [[], [], [], [], []]
+
+    while len(dset) > 0:
+        for episode in range(5):
+            if len(dset) > 0:
+                idx = random.randint(0, len(dset)-1)
+                splits[episode].append(dset.pop(idx))
+    return splits
+
+
 def load_data(labeled_data_file, lists_of_posts):
     qid = None
     lines = get_lines(labeled_data_file)
@@ -381,6 +392,49 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     return curr_id, sentence_ct, skipped_annotated, label_set
 
 
+def construct_uniform_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated):
+    lists_of_posts = defaultdict(list)
+    lists_of_posts_test = defaultdict(list)
+
+    # Load in the "train" and "dev" sets, which will be combined into a large train set
+    for labeled_data_file in labeled_data_files:
+        if labeled_data_file[-7:] == "dev.txt" or labeled_data_file[-9:] == "train.txt":
+            lists_of_posts = load_data(labeled_data_file, lists_of_posts)
+        else:
+            lists_of_posts_test = load_data(labeled_data_file, lists_of_posts_test)
+
+    curr_id = start_id
+    train_data, entity_types_to_json_elts, \
+    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_ct)
+
+    test_data, entity_types_to_json_elts_test, \
+    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts_test,
+                                                                    label_set, curr_id, sentence_ct)
+
+    train_splits = create_uniform_splits(train_data)
+    test_splits = create_uniform_splits(test_data)
+
+    # Save the train data
+    for idx, split in enumerate(train_splits):
+        with open(os.path.join(out_dir, "so_train_uniform_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(sorted(split, key=lambda x: int(x["id"])), f)
+
+    # Save all the train data together, for running the baseline
+    train_data = []
+    for split in train_splits:
+        train_data.extend(split)
+    for idx in range(len(train_splits)):
+        with open(os.path.join(out_dir, "so_train_all_uniform_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(sorted(train_data, key=lambda x: int(x["id"])), f)
+
+    # Save test data
+    for idx, split in enumerate(test_splits):
+        with open(os.path.join(out_dir, "so_test_uniform_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(split, f)
+
+    return curr_id, sentence_ct, skipped_annotated, label_set
+
+
 def create_sample_tr_test_space(xml_dump_file):
     etree = ET.parse(xml_dump_file)
     root = etree.getroot()
@@ -488,6 +542,12 @@ def plot_all_entity_pies(data_loc):
             # sorted_entities = sorted(list(entity_cts.keys()))
             plot_entity_pie(entity_cts, episode, train_test, entity_list, entity_colors, data_loc)
 
+            with open(os.path.join(data_loc, "so_%s_uniform_%d.json" % (train_test, episode)), 'r') as f:
+                data = json.load(f)
+            entity_cts = count_entities(data)
+            # sorted_entities = sorted(list(entity_cts.keys()))
+            plot_entity_pie(entity_cts, episode, train_test + "_uniform", entity_list, entity_colors, data_loc)
+
 
 def plot_average_percent_over_episodes(up_or_down, entities, train_test, entity_to_percentage_of_ep_1):
     avgs = [0.0] * 5
@@ -572,7 +632,10 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir):
     #                                                                                   label_set, curr_id,
     #                                                                                   sentence_ct,
     #                                                                                   skipped_annotated)
-    curr_id, sentence_ct, skipped_annotated, label_set = \
+
+    print("skewed dataset")
+
+    curr_id, sentence_ct, skipped_annotated, label_set_1 = \
         construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated)
 
     print("Number of annotated sentences: %d" % sentence_ct)
@@ -580,8 +643,21 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir):
     # print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
     # print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
+    print("\nuniform dataset")
+    curr_id, sentence_ct, skipped_annotated, label_set_2 = \
+        construct_uniform_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated)
+
+    if label_set_1 != label_set_2:
+        print("labels don't match!!!")
+        sys.exit(1)
+
+    print("Number of annotated sentences: %d" % sentence_ct)
+    print("Number of annotated sentences skipped: %d" % skipped_annotated)
+    # print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
+    # print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
+
     label_map = {}
-    for idx, l in enumerate(label_set):
+    for idx, l in enumerate(label_set_2):
         label_map[l] = idx
 
     with open(os.path.join(out_dir, "so_labels"), 'w') as labelf:

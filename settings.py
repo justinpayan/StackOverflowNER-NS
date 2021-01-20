@@ -471,4 +471,64 @@ TASK_DICT = {
                 "test": os.path.join(args.data_dir, "so_data", "so_test_5.json"),
                 "n_train_epochs": 5
     },
+    "so_u_1": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
+               "n_train_epochs": 25
+    },
+    "so_u_2": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_2.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
+               "n_train_epochs": 25
+    },
+    "so_u_3": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_3.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
+               "n_train_epochs": 25
+    },
+    "so_u_4": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_4.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
+               "n_train_epochs": 25
+    },
+    "so_u_5": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_5.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
+               "n_train_epochs": 25
+    },
+    "so_u_all_1": {
+               "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
+               "n_train_epochs": 5
+    },
+    "so_u_all_2": {
+                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_2.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
+                "n_train_epochs": 5
+    },
+    "so_u_all_3": {
+                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_3.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
+                "n_train_epochs": 5
+    },
+    "so_u_all_4": {
+                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_4.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
+                "n_train_epochs": 5
+    },
+    "so_u_all_5": {
+                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_5.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
+                "n_train_epochs": 5
+    },
 }

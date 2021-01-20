@@ -15,7 +15,7 @@ mkdir -p $OUTBASE/logs/train/finetune
 #        --gres=gpu:1 \
 #        ./setupandrunexp.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels \
 #        lll $OUTBASE/models ~/Lamolrelease
-
+#
 sbatch -J real_so \
         -e $OUTBASE/logs/train/real/lamol_train.err \
         -o $OUTBASE/logs/train/real/lamol_train.log \
@@ -45,4 +45,15 @@ sbatch -J whole_so \
         --time=01-00:00:00 \
         --gres=gpu:1 \
         ./setupandrunexp.sh 0.25 0.2 6.25e-5 0 "so_all_1 so_all_2 so_all_3 so_all_4 so_all_5" so_data/so_labels \
+        finetune $OUTBASE/models ~/Lamolrelease
+
+# Train on whole so train set, for getting a baseline
+sbatch -J whole_u_so \
+        -e $OUTBASE/logs/train/finetune/lamol_train_whole_u_so.err \
+        -o $OUTBASE/logs/train/finetune/lamol_train_whole_u_so.log \
+        --mem=15G \
+        --partition=m40-long \
+        --time=01-00:00:00 \
+        --gres=gpu:1 \
+        ./setupandrunexp.sh 0.25 0.2 6.25e-5 0 "so_u_all_1 so_u_all_2 so_u_all_3 so_u_all_4 so_u_all_5" so_data/so_labels \
         finetune $OUTBASE/models ~/Lamolrelease

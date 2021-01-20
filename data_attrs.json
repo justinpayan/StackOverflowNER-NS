@@ -27,5 +27,15 @@
   "so_all_2": {"train":  {"data_size": 11489, "max_a_len": 2}, "eval":  {"data_size": 600, "max_a_len": 2}, "test":  {"data_size": 600, "max_a_len": 2}},
   "so_all_3": {"train":  {"data_size": 11489, "max_a_len": 2}, "eval":  {"data_size": 493, "max_a_len": 2}, "test":  {"data_size": 493, "max_a_len": 2}},
   "so_all_4": {"train":  {"data_size": 11489, "max_a_len": 2}, "eval":  {"data_size": 792, "max_a_len": 2}, "test":  {"data_size": 792, "max_a_len": 2}},
-  "so_all_5": {"train":  {"data_size": 11489, "max_a_len": 2}, "eval":  {"data_size": 514, "max_a_len": 2}, "test":  {"data_size": 514, "max_a_len": 2}}
+  "so_all_5": {"train":  {"data_size": 11489, "max_a_len": 2}, "eval":  {"data_size": 514, "max_a_len": 2}, "test":  {"data_size": 514, "max_a_len": 2}},
+  "so_u_1": {"train":  {"data_size": 2470, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_2": {"train":  {"data_size": 2470, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_3": {"train":  {"data_size": 2470, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_4": {"train":  {"data_size": 2470, "max_a_len": 2}, "eval":  {"data_size": 629, "max_a_len": 2}, "test":  {"data_size": 629, "max_a_len": 2}},
+  "so_u_5": {"train":  {"data_size": 2470, "max_a_len": 2}, "eval":  {"data_size": 629, "max_a_len": 2}, "test":  {"data_size": 629, "max_a_len": 2}},
+  "so_u_all_1": {"train":  {"data_size": 12350, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_all_2": {"train":  {"data_size": 12350, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_all_3": {"train":  {"data_size": 12350, "max_a_len": 2}, "eval":  {"data_size": 630, "max_a_len": 2}, "test":  {"data_size": 630, "max_a_len": 2}},
+  "so_u_all_4": {"train":  {"data_size": 12350, "max_a_len": 2}, "eval":  {"data_size": 629, "max_a_len": 2}, "test":  {"data_size": 629, "max_a_len": 2}},
+  "so_u_all_5": {"train":  {"data_size": 12350, "max_a_len": 2}, "eval":  {"data_size": 629, "max_a_len": 2}, "test":  {"data_size": 629, "max_a_len": 2}}
 }
