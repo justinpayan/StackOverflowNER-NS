@@ -29,3 +29,4 @@ python test.py --data_dir $DATA_DIR \
 
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels lll /iesl/canvas/jpayan/Lamolrelease/models ~/Lamolrelease
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune /iesl/canvas/jpayan/Lamolrelease/models ~/Lamolrelease
+# ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
