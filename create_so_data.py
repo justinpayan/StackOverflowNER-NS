@@ -2,8 +2,10 @@ import argparse, csv, datetime, json, os, random, re, sys
 import xml.etree.ElementTree as ET
 from so_twokenize import tokenize
 from collections import Counter, defaultdict
+import Levenshtein
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import re
 import numpy as np
 
 from nltk.tokenize import sent_tokenize
@@ -14,8 +16,6 @@ abbreviation = ['u.s.a', 'fig', 'etc', 'eg', 'mr', 'mrs', 'e.g', 'no', 'vs', 'i.
 punkt_param.abbrev_types = set(abbreviation)
 sent_tokenizer = PunktSentenceTokenizer(punkt_param)
 
-np_gen = np.random.default_rng(seed=31415)
-
 
 def get_lines(filename):
     with open(filename, 'r') as f:
@@ -24,27 +24,41 @@ def get_lines(filename):
 
 
 def is_same(qa, text):
-    # if len(qa) != len(text):
-    #     return False
-    try:
-        for idx, l in enumerate(text):
-            if l[0].startswith("CODE_BLOCK"):
-                if qa[idx][0] != "CODE_BLOCK":
-                    return False
-                else:
-                    # print("matching code blocks, continue")
-                    return True
-            # The tokenizer is so different from what was actually used, the best we can do is see if a majority of lines
-            # match. Because the qid matches anyway, this is probably good enough.
-            if qa[idx] is not None and len(l) == len(qa[idx]):
-                for local_idx, s in enumerate(l):
-                    # print(s.split("\t")[0])
-                    # print(qa[idx][local_idx])
-                    if qa[idx][local_idx] != s.split("\t")[0]:
-                        return False
-                return True
-    except:
-        return False
+    for i in qa:
+        if i is None:
+            return False
+    for i in text:
+        if i is None:
+            return False
+
+    flattened_qa = [" ".join(sent) for sent in qa]
+    flattened_qa = " ".join(flattened_qa)
+    flattened_qa = re.sub("CODE_BLOCK : [QA]_[0-9]*", "CODE_BLOCK", flattened_qa)
+    flattened_qa = re.sub("--INLINE_CODE_BEGIN---", "", flattened_qa)
+    flattened_qa = re.sub("--INLINE_CODE_END---", "", flattened_qa)
+    flattened_qa = re.sub("\s+", " ", flattened_qa)
+
+
+
+    flattened_text = [" ".join([word.split("\t")[0] for word in sent]) for sent in text]
+    flattened_text = " ".join(flattened_text)
+    flattened_text = re.sub("CODE_BLOCK : [QA]_[0-9]*", "CODE_BLOCK", flattened_text)
+    flattened_text = re.sub("--INLINE_CODE_BEGIN---", "", flattened_text)
+    flattened_text = re.sub("--INLINE_CODE_END---", "", flattened_text)
+    flattened_text = re.sub("\s+", " ", flattened_text)
+
+
+
+    ld = Levenshtein.distance(flattened_qa, flattened_text)
+
+    max_len = max(len(flattened_qa), len(flattened_text))
+    if .05 < ld/max_len < .1:
+        print(flattened_qa)
+        print(flattened_text)
+        print(ld)
+        print()
+
+    return ld/max_len < .05
 
 
 def get_create_date(qid, text, from_xml_tokens):
@@ -99,9 +113,10 @@ def load_xml_dump(xml_dump_dir):
     for idx, file in enumerate(os.listdir(xml_dump_dir)):
         # if idx % 1 == 0:
         print(float(idx) / len(os.listdir(xml_dump_dir)))
+        print(file)
         lines = list(get_lines(os.path.join(xml_dump_dir, file)))
-        qid = lines[0].strip().split(" ")[-1].split("_")[0]
-        creation_date = datetime.datetime.strptime(lines[2][:10], "%Y-%m-%d")
+        qid = lines[0].strip().split("_")[0]
+        creation_date = datetime.datetime.strptime(lines[1][:10], "%Y-%m-%d")
         text = []
         # print("STARTING TOKENIZING:")
         # print(lines[4:])
@@ -109,15 +124,16 @@ def load_xml_dump(xml_dump_dir):
         # print("year: %d" % creation_year)
         # print()
         # print(lines)
-        for l in lines[4:]:
-            try:
-                text.append(tokenize(l))
-            except Exception as e:
-                print(e)
-                print(qid)
-                print(l)
-                skipped_sentences += 1
-                text.append(None)
+        for l in lines[2:]:
+            if len(l.strip()) > 0:
+                try:
+                    text.append(tokenize(l))
+                except Exception as e:
+                    print(e)
+                    print(qid)
+                    print(l)
+                    skipped_sentences += 1
+                    text.append(None)
         if len([t for t in text if t is not None]) > 0:
             from_xml_tokens[qid].append([creation_date, text])
             nonskipped_sentences += len(text)
@@ -130,31 +146,45 @@ def load_xml_dump(xml_dump_dir):
     return from_xml_tokens, skipped_sentences, nonskipped_sentences
 
 
-def construct_time_based_dataset(from_xml_tokens, labeled_data_file, out_base, label_set, start_id, sentence_ct,
-                                 skipped_annotated):
-    # Load in the full lines... store as a map from qid to a list of q's or a's, each of which is a list of lines
-    lists_of_posts = defaultdict(list)
-    qid = None
-    lines = get_lines(labeled_data_file)
-    for l in lines:
-        if get_first(l).lower() in ['question_id', 'answer_to_question_id']:
-            next(lines)
-            qid = next(lines).strip().split("\t")[0]
-            lists_of_posts[qid].append([])
-        elif get_first(l).lower() == 'question_url':
-            next(lines)
-            next(lines)
-        elif len(l.strip()) > 0:
-            single_sent = [l]
-            n = next(lines)
-            while len(n.strip()) > 0:
-                single_sent.append(n)
-                n = next(lines)
-            lists_of_posts[qid][-1].append(single_sent)
-
-    print("done loading in annotated data")
-
+def get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated, cutoffs, from_xml_tokens, lists_of_posts):
     data_splits = [[], [], [], [], []]
+
+    for qid in lists_of_posts:
+        for text in lists_of_posts[qid]:
+            # text is a list of lists
+            # print("getting create date for qid %s with text %s\n" % (qid, str(text)))
+            create_date = get_create_date(qid, text, from_xml_tokens)
+            # print(create_date)
+            # print("\n\n")
+            if create_date is not None:
+                which_split = -1
+                for i in range(5):
+                    if create_date < cutoffs[i]:
+                        which_split = i
+                        break
+
+                json_elts, new_labels, curr_id = create_json_elts(text, create_date, qid, curr_id)
+                data_splits[which_split].extend(json_elts)
+                for nl in new_labels:
+                    label_set |= nl
+                sentence_ct += len(text)
+            else:
+                # print(text)
+                skipped_annotated += len(text)
+    return curr_id, label_set, sentence_ct, skipped_annotated, data_splits
+
+
+def construct_time_based_dataset(from_xml_tokens, labeled_data_files, out_dir,
+                                 label_set, start_id, sentence_ct, skipped_annotated):
+    lists_of_posts = defaultdict(list)
+    lists_of_posts_test = defaultdict(list)
+
+    # Load in the "train" and "dev" sets, which will be combined into a large train set
+    for labeled_data_file in labeled_data_files:
+        if labeled_data_file[-7:] == "dev.txt" or labeled_data_file[-9:] == "train.txt":
+            lists_of_posts = load_data(labeled_data_file, lists_of_posts)
+        else:
+            lists_of_posts_test = load_data(labeled_data_file, lists_of_posts_test)
 
     # determine date cutoffs for each split, print them out.
     # amount_per_split = sum([sum([len(text) for text in qid]) for qid in lists_of_posts])/5
@@ -181,41 +211,33 @@ def construct_time_based_dataset(from_xml_tokens, labeled_data_file, out_base, l
                datetime.datetime(2050, 1, 1, 0, 0)]
 
     curr_id = start_id
-    for qid in lists_of_posts:
-        for text in lists_of_posts[qid]:
-            # text is a list of lists
-            # print("getting create date for qid %s with text %s\n" % (qid, str(text)))
-            create_date = get_create_date(qid, text, from_xml_tokens)
-            # print(create_date)
-            # print("\n\n")
-            if create_date is not None:
-                for i in range(5):
-                    if create_date < cutoffs[i]:
-                        which_split = i
-                        break
 
-                json_elts, new_labels, curr_id = create_json_elts(text, create_date, qid, curr_id)
-                data_splits[which_split].extend(json_elts)
-                label_set |= new_labels
-                sentence_ct += len(text)
-            else:
-                # print(text)
-                skipped_annotated += len(text)
+    curr_id, label_set, sentence_ct, skipped_annotated, train_splits = \
+        get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated,
+                            cutoffs, from_xml_tokens, lists_of_posts)
 
-    # Go through lists_of_posts, matching them up with things we loaded in from the xml_dump files, then assign
-    # to the correct dict... these can be directly written out as
+    curr_id, label_set, sentence_ct, skipped_annotated, test_splits = \
+        get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated,
+                            cutoffs, from_xml_tokens, lists_of_posts_test)
 
-    if labeled_data_file[-7:] == "dev.txt":
-        for idx, split in enumerate(data_splits):
-            with open(out_base + "_%d.json" % (idx + 1), 'r') as f:
-                train_data_split = json.load(f)
-            d_split = train_data_split + data_splits[idx]
-            with open(out_base + "_%d.json" % (idx + 1), 'w') as f:
-                json.dump(d_split, f)
-    else:
-        for idx, split in enumerate(data_splits):
-            with open(out_base + "_%d.json" % (idx + 1), 'w') as f:
-                json.dump(data_splits[idx], f)
+    # Save the train data
+    for idx, split in enumerate(train_splits):
+        with open(os.path.join(out_dir, "so_temporal_train_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(sorted(split, key=lambda x: int(x["id"])), f)
+
+    # Save all the train data together, for running the baseline
+    # Save 5 copies, so we can just pretend there are 5 training sets and 5 test sets for the code that
+    # expects episodes.
+    train_data = []
+    for split in train_splits:
+        train_data.extend(split)
+    for idx in range(len(train_splits)):
+        with open(os.path.join(out_dir, "so_temporal_train_all_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(sorted(train_data, key=lambda x: int(x["id"])), f)
+
+    for idx, split in enumerate(test_splits):
+        with open(os.path.join(out_dir, "so_temporal_test_%d.json" % (idx + 1)), 'w') as f:
+            json.dump(split, f)
 
     return curr_id, sentence_ct, skipped_annotated, label_set
 
@@ -316,7 +338,7 @@ def map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_c
     return train_data, entity_types_to_json_elts, label_set, curr_id, sentence_ct
 
 
-def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated):
+def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated, np_gen):
     lists_of_posts = defaultdict(list)
     lists_of_posts_test = defaultdict(list)
 
@@ -451,30 +473,6 @@ def get_first(line):
     return line.strip().split("\t")[0]
 
 
-def get_qids_of_interest(labeled_data_files, lists_of_posts_loc):
-    lists_of_posts = defaultdict(list)
-    qid = None
-    for f in labeled_data_files:
-        lines = get_lines(f)
-        for l in lines:
-            if get_first(l).lower() in ['question_id', 'answer_to_question_id']:
-                next(lines)
-                qid = next(lines).strip().split("\t")[0]
-                lists_of_posts[qid].append([])
-            elif get_first(l).lower() == 'question_url':
-                next(lines)
-                next(lines)
-            elif len(l.strip()) > 0:
-                single_sent = [get_first(l)]
-                n = next(lines)
-                while len(n.strip()) > 0:
-                    single_sent.append(get_first(n))
-                    n = next(lines)
-                lists_of_posts[qid][-1].append(single_sent)
-    with open(lists_of_posts_loc, "w") as f:
-        json.dump(lists_of_posts, f)
-
-
 def count_entities(data):
     entity_cts = Counter()
     for d in data:
@@ -534,19 +532,55 @@ def plot_all_entity_pies(data_loc):
     print("entity_colors")
     print(entity_colors)
 
+    entity_cts_by_ep = {"train": [], "test": []}
+    entity_cts_by_ep_unif = {"train": [], "test": []}
+    entity_cts_by_ep_temporal = {"train": [], "test": []}
+    all_entity_types = set()
     for episode in range(1, 6):
         for train_test in ["train", "test"]:
             with open(os.path.join(data_loc, "so_%s_%d.json" % (train_test, episode)), 'r') as f:
                 data = json.load(f)
             entity_cts = count_entities(data)
+            entity_cts_by_ep[train_test].append(entity_cts)
+            all_entity_types |= set(entity_cts.keys())
             # sorted_entities = sorted(list(entity_cts.keys()))
             plot_entity_pie(entity_cts, episode, train_test, entity_list, entity_colors, data_loc)
 
             with open(os.path.join(data_loc, "so_%s_uniform_%d.json" % (train_test, episode)), 'r') as f:
                 data = json.load(f)
             entity_cts = count_entities(data)
+            entity_cts_by_ep_unif[train_test].append(entity_cts)
             # sorted_entities = sorted(list(entity_cts.keys()))
             plot_entity_pie(entity_cts, episode, train_test + "_uniform", entity_list, entity_colors, data_loc)
+
+            with open(os.path.join(data_loc, "so_temporal_%s_%d.json" % (train_test, episode)), 'r') as f:
+                data = json.load(f)
+            entity_cts = count_entities(data)
+            entity_cts_by_ep_temporal[train_test].append(entity_cts)
+            # sorted_entities = sorted(list(entity_cts.keys()))
+            plot_entity_pie(entity_cts, episode, train_test + "_temporal", entity_list, entity_colors, data_loc)
+
+    # Write out the entity counts by episode
+    for train_test in ["train", "test"]:
+        entity_list = sorted(all_entity_types)
+        with open(os.path.join(data_loc, "so_%s_entity_counts.csv" % train_test), 'w') as f:
+            f.write(",".join(entity_list) + "\n")
+            for ep in range(5):
+                f.write(",".join([str(entity_cts_by_ep[train_test][ep][ent_type]) for ent_type in entity_list]) + "\n")
+
+    for train_test in ["train", "test"]:
+        entity_list = sorted(all_entity_types)
+        with open(os.path.join(data_loc, "so_%s_entity_counts_uniform.csv" % train_test), 'w') as f:
+            f.write(",".join(entity_list) + "\n")
+            for ep in range(5):
+                f.write(",".join([str(entity_cts_by_ep_unif[train_test][ep][ent_type]) for ent_type in entity_list]) + "\n")
+
+    for train_test in ["train", "test"]:
+        entity_list = sorted(all_entity_types)
+        with open(os.path.join(data_loc, "so_%s_entity_counts_temporal.csv" % train_test), 'w') as f:
+            f.write(",".join(entity_list) + "\n")
+            for ep in range(5):
+                f.write(",".join([str(entity_cts_by_ep_temporal[train_test][ep][ent_type]) for ent_type in entity_list]) + "\n")
 
 
 def plot_average_percent_over_episodes(up_or_down, entities, train_test, entity_to_percentage_of_ep_1):
@@ -614,29 +648,40 @@ def plot_percentage_change_over_episodes():
         plot_average_percent_over_episodes("down", entities_down, train_test, entity_to_percentage_of_ep_1)
 
 
-def create_all_datasets(xml_dump_dir, data_dir, out_dir):
+def create_all_datasets(xml_dump_dir, data_dir, out_dir, np_gen):
     labeled_data_files = ["train.txt", "dev.txt", "test.txt"]
     labeled_data_files = [os.path.join(data_dir, "StackOverflowNER/resources/annotated_ner_data/StackOverflow",
                                        f_name) for f_name in labeled_data_files]
-    # get_qids_of_interest(labeled_data_files, lists_of_posts_loc)
 
     # from_xml_tokens, skipped_sentences, nonskipped_sentences = load_xml_dump(xml_dump_dir)
+    import pickle
+    # with open("from_xml_tokens.pk", "wb") as f:
+    #     pickle.dump(from_xml_tokens, f)
+    with open("from_xml_tokens.pk", "rb") as f:
+        from_xml_tokens = pickle.load(f)
+    skipped_sentences = 10000000000000000
+    nonskipped_sentences = 100000000000000000000
 
     curr_id = 0
     label_set = set()
     sentence_ct = 0
     skipped_annotated = 0
 
-    # curr_id, sentence_ct, skipped_annotated, label_set = construct_time_based_dataset(from_xml_tokens,
-    #                                                                                   labeled_data_file, out_base,
-    #                                                                                   label_set, curr_id,
-    #                                                                                   sentence_ct,
-    #                                                                                   skipped_annotated)
+    print("time based dataset")
+
+    curr_id, sentence_ct, skipped_annotated, label_set = \
+        construct_time_based_dataset(from_xml_tokens, labeled_data_files, out_dir,
+                                     label_set, curr_id, sentence_ct, skipped_annotated)
+
+    print("Number of annotated sentences: %d" % sentence_ct)
+    print("Number of annotated sentences skipped: %d" % skipped_annotated)
+    print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
+    print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
     print("skewed dataset")
 
     curr_id, sentence_ct, skipped_annotated, label_set_1 = \
-        construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated)
+        construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated, np_gen)
 
     print("Number of annotated sentences: %d" % sentence_ct)
     print("Number of annotated sentences skipped: %d" % skipped_annotated)
@@ -647,7 +692,7 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir):
     curr_id, sentence_ct, skipped_annotated, label_set_2 = \
         construct_uniform_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated)
 
-    if label_set_1 != label_set_2:
+    if label_set_1 != label_set_2 or label_set_2 != label_set:
         print("labels don't match!!!")
         sys.exit(1)
 
@@ -677,8 +722,9 @@ if __name__ == "__main__":
     args = parse_args()
 
     random.seed(31415)
-    # np.default_rng is seeded at top
+    np_gen = np.random.default_rng(seed=31415)
+    np.random.seed(31415)
 
-    create_all_datasets(args.xml_dump_dir, args.labeled_data_dir, args.json_dir)
+    create_all_datasets(args.xml_dump_dir, args.labeled_data_dir, args.json_dir, np_gen)
     plot_all_entity_pies(args.json_dir)
     # plot_percentage_change_over_episodes()
