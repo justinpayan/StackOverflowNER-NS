@@ -84,6 +84,7 @@ def create_json_elts(text, create_date, qid, start_id):
     json_elts = []
     curr_id = start_id
     new_labels = []
+    code_block_ct = 0
 
     for l in text:
         if not l[0].startswith("CODE_BLOCK"):
@@ -102,8 +103,10 @@ def create_json_elts(text, create_date, qid, start_id):
             for label in [s.split("\t")[1] for s in l]:
                 new_labels_here.add(label)
             new_labels.append(new_labels_here)
+        else:
+            code_block_ct += 1
 
-    return json_elts, new_labels, curr_id
+    return json_elts, new_labels, curr_id, code_block_ct
 
 
 def load_xml_dump(xml_dump_dir):
@@ -148,6 +151,7 @@ def load_xml_dump(xml_dump_dir):
 
 def get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated, cutoffs, from_xml_tokens, lists_of_posts):
     data_splits = [[], [], [], [], []]
+    code_block_ct = 0
 
     for qid in lists_of_posts:
         for text in lists_of_posts[qid]:
@@ -163,7 +167,8 @@ def get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated, cuto
                         which_split = i
                         break
 
-                json_elts, new_labels, curr_id = create_json_elts(text, create_date, qid, curr_id)
+                json_elts, new_labels, curr_id, cbc = create_json_elts(text, create_date, qid, curr_id)
+                code_block_ct += 1
                 data_splits[which_split].extend(json_elts)
                 for nl in new_labels:
                     label_set |= nl
@@ -171,7 +176,7 @@ def get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated, cuto
             else:
                 # print(text)
                 skipped_annotated += len(text)
-    return curr_id, label_set, sentence_ct, skipped_annotated, data_splits
+    return curr_id, label_set, sentence_ct, skipped_annotated, data_splits, code_block_ct
 
 
 def construct_time_based_dataset(from_xml_tokens, labeled_data_files, out_dir,
@@ -212,13 +217,15 @@ def construct_time_based_dataset(from_xml_tokens, labeled_data_files, out_dir,
 
     curr_id = start_id
 
-    curr_id, label_set, sentence_ct, skipped_annotated, train_splits = \
+    curr_id, label_set, sentence_ct, skipped_annotated, train_splits, code_block_count_train = \
         get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated,
                             cutoffs, from_xml_tokens, lists_of_posts)
 
-    curr_id, label_set, sentence_ct, skipped_annotated, test_splits = \
+    curr_id, label_set, sentence_ct, skipped_annotated, test_splits, code_block_count_test = \
         get_temporal_splits(curr_id, label_set, sentence_ct, skipped_annotated,
                             cutoffs, from_xml_tokens, lists_of_posts_test)
+
+    print("%d code blocks in train, %d in test" % (code_block_count_train, code_block_count_test))
 
     # Save the train data
     for idx, split in enumerate(train_splits):
@@ -322,11 +329,13 @@ def map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_c
     train_data = []
     # Create a map from entity types to sentences which are available
     entity_types_to_json_elts = defaultdict(list)
+    code_block_ct = 0
 
     for qid in lists_of_posts:
         for text in lists_of_posts[qid]:
             # text is a list of lists
-            json_elts, new_labels, curr_id = create_json_elts(text, None, qid, curr_id)
+            json_elts, new_labels, curr_id, cbc = create_json_elts(text, None, qid, curr_id)
+            code_block_ct += cbc
             train_data.extend(json_elts)
             for local_new_labels, json_elt in zip(new_labels, json_elts):
                 label_set |= local_new_labels
@@ -335,7 +344,7 @@ def map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_c
                         entity_types_to_json_elts[l[2:]].append(json_elt)
             sentence_ct += len(text)
 
-    return train_data, entity_types_to_json_elts, label_set, curr_id, sentence_ct
+    return train_data, entity_types_to_json_elts, label_set, curr_id, sentence_ct, code_block_ct
 
 
 def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated, np_gen):
@@ -351,11 +360,13 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
 
     curr_id = start_id
     train_data, entity_types_to_json_elts, \
-    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_ct)
+    label_set, curr_id, sentence_ct, code_block_ct_train = map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_ct)
 
     test_data, entity_types_to_json_elts_test, \
-    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts_test,
+    label_set, curr_id, sentence_ct, code_block_ct_test = map_entity_types_to_json_elts(lists_of_posts_test,
                                                                     label_set, curr_id, sentence_ct)
+
+    print("%d code blocks in train, %d in test" % (code_block_ct_train, code_block_ct_test))
 
     # Get the initial distribution of the entity types
     # only do this for the training set, and then use the same distribution plus noise to sample test data
@@ -427,11 +438,13 @@ def construct_uniform_dataset(labeled_data_files, out_dir, label_set, start_id, 
 
     curr_id = start_id
     train_data, entity_types_to_json_elts, \
-    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_ct)
+    label_set, curr_id, sentence_ct, code_block_ct_train = map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_ct)
 
     test_data, entity_types_to_json_elts_test, \
-    label_set, curr_id, sentence_ct = map_entity_types_to_json_elts(lists_of_posts_test,
+    label_set, curr_id, sentence_ct, code_block_ct_test = map_entity_types_to_json_elts(lists_of_posts_test,
                                                                     label_set, curr_id, sentence_ct)
+
+    print("%d code blocks in train, %d in test" % (code_block_ct_train, code_block_ct_test))
 
     train_splits = create_uniform_splits(train_data)
     test_splits = create_uniform_splits(test_data)
@@ -680,6 +693,7 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir, np_gen):
 
     print("skewed dataset")
 
+    sentence_ct = 0
     curr_id, sentence_ct, skipped_annotated, label_set_1 = \
         construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated, np_gen)
 
@@ -689,6 +703,8 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir, np_gen):
     # print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
     print("\nuniform dataset")
+
+    sentence_ct = 0
     curr_id, sentence_ct, skipped_annotated, label_set_2 = \
         construct_uniform_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated)
 

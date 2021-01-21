@@ -23,3 +23,5 @@ python test.py --data_dir $DATA_DIR \
 # --add_task_tokens --use_task_in_ner
 
 # ./runtestreal.sh 0.25 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels $OUTBASE/models ~/Lamolrelease
+# ./runtestreal.sh 0.25 6.25e-5 0 "so_t_1 so_t_2 so_t_3 so_t_4 so_t_5" so_data/so_labels $OUTBASE/models ~/Lamolrelease
+
