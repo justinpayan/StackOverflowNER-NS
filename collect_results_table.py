@@ -44,7 +44,7 @@ def get_results_one_setting(results_location):
                 results.append(list_results(rf_full))
 
     results = np.array(results)
-    return np.mean(results, axis=1).tolist()
+    return np.mean(results, axis=0).tolist()
 
 
 def collect_results(results_dir):
@@ -70,9 +70,9 @@ def collect_results(results_dir):
 
 def print_table(r):
     for ep_type in ["Temporal", "Skewed"]:
-        print("& Baseline & " + " & ".join(["%.3f" % i for i in r[ep_type]["Baseline"]]) + "\\")
-        print(ep_type + " & No Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["No Replay"]]) + "\\")
-        print("& Real Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["Real Replay"]]) + "\\")
+        print("& Baseline & " + " & ".join(["%.3f" % i for i in r[ep_type]["Baseline"]]) + "\\\\")
+        print(ep_type + " & No Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["No Replay"]]) + "\\\\")
+        print("& Real Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["Real Replay"]]) + "\\\\")
 
 
 if __name__ == "__main__":
