@@ -16,13 +16,16 @@ def list_results(file_name):
     results = []
     with open(file_name, 'r') as f:
         lines = f.readlines()
-    for l in lines:
-        l = l.strip()
-        if l.startswith("accuracy") or l.startswith("Application") or l.startswith("Code_Block") or \
-                l.startswith("User_Interface_Element") or l.startswith("Library_Class") or \
-                l.startswith("Data_Structure") or l.startswith("Variable_Name"):
-            fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
-            results.append(fscore)
+    for which_result in ["accuracy", "Application", "Code_Block", "Data_Structure", "Library_Class",
+                         "User_Interface_Element", "Variable_Name"]:
+        fscore = None
+        for l in lines:
+            l = l.strip()
+            if l.startswith(which_result):
+                fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
+                results.append(fscore)
+        if not fscore:
+            results.append(0.0)
     return results
 
 
