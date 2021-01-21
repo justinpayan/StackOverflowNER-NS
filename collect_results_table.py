@@ -21,7 +21,7 @@ def list_results(file_name):
         if l.startswith("accuracy") or l.startswith("Application") or l.startswith("Code_Block") or \
                 l.startswith("User_Interface_Element") or l.startswith("Library_Class") or \
                 l.startswith("Data_Structure") or l.startswith("Variable_Name"):
-            fscore = float(re.search("FB1:\s*(\d\d\.\d\d)", l).group(1))
+            fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
             results.append(fscore)
     return results
 
