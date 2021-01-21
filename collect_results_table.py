@@ -70,9 +70,9 @@ def collect_results(results_dir):
 
 def print_table(r):
     for ep_type in ["Temporal", "Skewed"]:
-        print("& Baseline & " + " & ".join(r[ep_type]["Baseline"]) + "\\")
-        print(ep_type + " & No Replay & " + " & ".join(r[ep_type]["No Replay"]) + "\\")
-        print("& Real Replay & " + " & ".join(r[ep_type]["Real Replay"]) + "\\")
+        print("& Baseline & " + " & ".join([str(i) for i in r[ep_type]["Baseline"]]) + "\\")
+        print(ep_type + " & No Replay & " + " & ".join([str(i) for i in r[ep_type]["No Replay"]]) + "\\")
+        print("& Real Replay & " + " & ".join([str(i) for i in r[ep_type]["Real Replay"]]) + "\\")
 
 
 if __name__ == "__main__":
