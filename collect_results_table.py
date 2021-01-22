@@ -119,8 +119,8 @@ def make_plots(r):
                      marker=markers[ep_type],
                      linestyle=linestyles[train_setting],
                      label="%s, %s" % (ep_type, train_setting))
-    plt.set_xlabel("Episode")
-    plt.set_ylabel("Ep. 1 F1")
+    plt.xlabel("Episode")
+    plt.ylabel("Ep. 1 F1")
     plt.savefig("ep_1_time.png")
 
 
