@@ -78,9 +78,29 @@ def get_results_one_setting(results_location):
     return np.mean(results, axis=0).tolist()
 
 
+def get_results_one_setting_agg_over_time(results_location):
+    results = []
+
+    ep_5_dir = None
+    for ep_dir in os.listdir(results_location):
+        if ep_dir.endswith("_5"):
+            ep_5_dir = os.path.join(results_location, ep_dir)
+
+    for test_ep in range(1, 6):
+        for result_file in os.listdir(ep_5_dir):
+            if result_file.endswith("%d_finish" % test_ep) and result_file.startswith("ner_conll_score_out"):
+                rf_full = os.path.join(ep_5_dir, result_file)
+                results.append(get_overall_f1(rf_full))
+
+    return results
+
+
 def collect_results(results_dir):
     results_ep_5_train_all_eps_test = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
                                        "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+
+    results_ep_5_train_all_eps_test_agg_over_time = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                                     "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
     results_all_eps_train_ep_1_test = {"Temporal": {"No Replay": [], "Real Replay": []},
                                        "Skewed": {"No Replay": [], "Real Replay": []}}
@@ -98,10 +118,12 @@ def collect_results(results_dir):
         for train_setting in ["Baseline", "No Replay", "Real Replay"]:
             results_location = os.path.join(results_dir, subdirs[ep_type][train_setting])
             results_ep_5_train_all_eps_test[ep_type][train_setting] = get_results_one_setting(results_location)
+            results_ep_5_train_all_eps_test_agg_over_time[ep_type][train_setting] = \
+                get_results_one_setting_agg_over_time(results_location)
             if train_setting != "Baseline":
                 results_all_eps_train_ep_1_test[ep_type][train_setting] = get_results_ep_1(results_location)
 
-    return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test
+    return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test, results_ep_5_train_all_eps_test_agg_over_time
 
 
 def print_table(r):
@@ -129,9 +151,25 @@ def make_plots(r):
     plt.savefig("ep_1_time.png")
 
 
+def make_plots_all_tests(r):
+    linestyles = {"No Replay": "--", "Real Replay": "-", "Baseline": ":"}
+    ep_type = "Skewed"
+    for train_setting in ["No Replay", "Real Replay"]:
+        plt.plot(r[ep_type][train_setting],
+                 linestyle=linestyles[train_setting],
+                 color="k",
+                 label=train_setting)
+    plt.xlabel("Test Episode", fontsize="large")
+    plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
+    plt.ylabel("Test F1", fontsize="large")
+    plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
+    plt.savefig("skewed_tests_over_time.png")
+
+
 if __name__ == "__main__":
     args = parse_args()
 
-    all_results, ep_1_over_time = collect_results(args.results_dir)
+    all_results, ep_1_over_time, test_all_eps = collect_results(args.results_dir)
     print_table(all_results)
     make_plots(ep_1_over_time)
+    make_plots_all_tests(test_all_eps)
