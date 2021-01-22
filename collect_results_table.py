@@ -47,14 +47,16 @@ def get_results_ep_1(results_location):
     results = []
 
     ep_5_dir = None
-    for ep_dir in os.listdir(results_location):
+    for ep_dir in sorted(os.listdir(results_location)):
         if not ep_dir.startswith("log"):
             ep_dir = os.path.join(results_location, ep_dir)
-            for result_file in os.listdir(ep_dir):
+            for result_file in sorted(os.listdir(ep_dir)):
                 if result_file.endswith("1_finish") and result_file.startswith("ner_conll_score_out"):
                     rf_full = os.path.join(ep_dir, result_file)
                     results.append(get_overall_f1(rf_full))
 
+    print(results_location)
+    print(results)
     return results
 
 
