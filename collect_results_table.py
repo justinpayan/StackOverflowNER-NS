@@ -120,10 +120,10 @@ def make_plots(r):
                      linestyle=linestyles[train_setting],
                      color="k",
                      label="%s - %s" % (ep_type, train_setting))
-    plt.xlabel("Episode")
+    plt.xlabel("Episode", fontsize="medium")
     plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
-    plt.ylabel("Episode 1 Test F1")
-    plt.legend(loc="center right", bbox_to_anchor=(.9, 0.4))
+    plt.ylabel("Episode 1 Test F1", fontsize="medium")
+    plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
     plt.savefig("ep_1_time.png")
 
 
