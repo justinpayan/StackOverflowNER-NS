@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -29,6 +30,34 @@ def list_results(file_name):
     return results
 
 
+def get_overall_f1(file_name):
+    with open(file_name, 'r') as f:
+        lines = f.readlines()
+
+    for l in lines:
+        l = l.strip()
+        if l.startswith("accuracy"):
+            fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
+            return fscore
+
+    return 0.0
+
+
+def get_results_ep_1(results_location):
+    results = []
+
+    ep_5_dir = None
+    for ep_dir in os.listdir(results_location):
+        if not ep_dir.startswith("log"):
+            ep_dir = os.path.join(results_location, ep_dir)
+            for result_file in os.listdir(ep_dir):
+                if result_file.endswith("1_finish") and result_file.startswith("ner_conll_score_out"):
+                    rf_full = os.path.join(ep_dir, result_file)
+                    results.append(get_overall_f1(rf_full))
+
+    return results
+
+
 def get_results_one_setting(results_location):
     results = []
 
@@ -48,8 +77,11 @@ def get_results_one_setting(results_location):
 
 
 def collect_results(results_dir):
-    results = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-               "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+    results_ep_5_train_all_eps_test = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                       "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+
+    results_all_eps_train_ep_1_test = {"Temporal": {"No Replay": [], "Real Replay": []},
+                                       "Skewed": {"No Replay": [], "Real Replay": []}}
 
     subdirs = {"Temporal":
                    {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner",
@@ -63,9 +95,11 @@ def collect_results(results_dir):
     for ep_type in ["Temporal", "Skewed"]:
         for train_setting in ["Baseline", "No Replay", "Real Replay"]:
             results_location = os.path.join(results_dir, subdirs[ep_type][train_setting])
-            results[ep_type][train_setting] = get_results_one_setting(results_location)
+            results_ep_5_train_all_eps_test[ep_type][train_setting] = get_results_one_setting(results_location)
+            if train_setting != "Baseline":
+                results_all_eps_train_ep_1_test[ep_type][train_setting] = get_results_ep_1(results_location)
 
-    return results
+    return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test
 
 
 def print_table(r):
@@ -73,10 +107,26 @@ def print_table(r):
         print("& Baseline & " + " & ".join(["%.3f" % i for i in r[ep_type]["Baseline"]]) + "\\\\")
         print(ep_type + " & No Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["No Replay"]]) + "\\\\")
         print("& Real Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["Real Replay"]]) + "\\\\")
+        print("\\midrule")
+
+
+def make_plots(r):
+    colors = {"Temporal": "b", "Skewed": "r"}
+    styles = {"No Replay": "-", "Real Replay": "."}
+    for ep_type in ["Temporal", "Skewed"]:
+        for train_setting in ["No Replay", "Real Replay"]:
+            plt.plot(r[ep_type][train_setting],
+                     color=colors[ep_type],
+                     style=styles[train_setting],
+                     label="%s, %s" % (ep_type, train_setting))
+    plt.set_xlabel("Episode")
+    plt.set_ylabel("Ep. 1 F1")
+    plt.savefig("ep_1_time.png")
 
 
 if __name__ == "__main__":
     args = parse_args()
 
-    all_results = collect_results(args.results_dir)
+    all_results, ep_1_over_time = collect_results(args.results_dir)
     print_table(all_results)
+    make_plots(ep_1_over_time)
