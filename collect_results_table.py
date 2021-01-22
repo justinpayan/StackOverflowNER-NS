@@ -154,7 +154,8 @@ def make_plots(r):
 def make_plots_all_tests(r):
     linestyles = {"No Replay": "--", "Real Replay": "-", "Baseline": ":"}
     ep_type = "Skewed"
-    for train_setting in ["No Replay", "Real Replay"]:
+    plt.clf()
+    for train_setting in ["No Replay", "Real Replay", "Baseline"]:
         plt.plot(r[ep_type][train_setting],
                  linestyle=linestyles[train_setting],
                  color="k",
