@@ -111,7 +111,7 @@ def print_table(r):
 
 
 def make_plots(r):
-    markers = {"Temporal": "o", "Skewed": "."}
+    markers = {"Temporal": "o", "Skewed": "x"}
     linestyles = {"No Replay": "-", "Real Replay": "--"}
     for ep_type in ["Temporal", "Skewed"]:
         for train_setting in ["No Replay", "Real Replay"]:
@@ -120,7 +120,8 @@ def make_plots(r):
                      linestyle=linestyles[train_setting],
                      label="%s, %s" % (ep_type, train_setting))
     plt.xlabel("Episode")
-    plt.ylabel("Ep. 1 F1")
+    plt.ylabel("F1-Score, Episode 1 Test")
+    plt.legend()
     plt.savefig("ep_1_time.png")
 
 
