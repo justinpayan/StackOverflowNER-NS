@@ -155,20 +155,24 @@ def make_plots_all_tests(r, on_train):
     linestyles = {"No Replay": "--", "Real Replay": "-", "Baseline": ":"}
     relabels = {"No Replay": "CL without Replay", "Real Replay": "CL with Real Replay", "Baseline": "Baseline (non-CL)"}
     ep_type = "Skewed"
-    color_map={"No Replay": "royal_blue", "Real Replay": "fore", "Baseline": "k"}
+    color_map={"No Replay": "royalblue", "Real Replay": "darkorange", "Baseline": "forestgreen"}
     plt.clf()
     for train_setting in ["No Replay", "Real Replay", "Baseline"]:
         plt.plot(r[ep_type][train_setting],
                  linestyle=linestyles[train_setting],
                  color=color_map[train_setting],
                  label=relabels[train_setting])
-    plt.xlabel("Test Episode", fontsize="large")
-    plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
-    plt.ylabel("Test F1", fontsize="large")
-    plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
     if on_train:
+        plt.xlabel("Train Episode", fontsize="large")
+        plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
+        plt.ylabel("Train F1", fontsize="large")
+        plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
         plt.savefig("skewed_tests_on_train_over_time.png")
     else:
+        plt.xlabel("Test Episode", fontsize="large")
+        plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
+        plt.ylabel("Test F1", fontsize="large")
+        plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
         plt.savefig("skewed_tests_over_time.png")
 
 
