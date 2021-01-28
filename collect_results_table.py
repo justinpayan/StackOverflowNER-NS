@@ -156,7 +156,7 @@ def make_plots_all_tests(r, on_train, ep_type):
     relabels = {"No Replay": "CL without Replay", "Real Replay": "CL with Real Replay", "Baseline": "Baseline (non-CL)"}
     color_map={"No Replay": "royalblue", "Real Replay": "darkorange", "Baseline": "forestgreen"}
     plt.clf()
-    for train_setting in ["No Replay", "Real Replay", "Baseline"]:
+    for train_setting in ["Baseline", "Real Replay", "No Replay"]:
         plt.plot(r[ep_type][train_setting],
                  linestyle=linestyles[train_setting],
                  color=color_map[train_setting],
