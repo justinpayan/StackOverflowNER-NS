@@ -348,7 +348,7 @@ def map_entity_types_to_json_elts(lists_of_posts, label_set, curr_id, sentence_c
     return train_data, entity_types_to_json_elts, label_set, curr_id, sentence_ct, code_block_ct
 
 
-def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated, np_gen):
+def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, sentence_ct, skipped_annotated, np_gen, c):
     lists_of_posts = defaultdict(list)
     lists_of_posts_test = defaultdict(list)
 
@@ -376,7 +376,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
 
     # Sample the entity type distributions for each episode
     cts = np.array([e[1] for e in sorted_entities])
-    normalization = np.sum(cts) / 5
+    normalization = np.sum(cts) / c
     entity_distribs = np_gen.dirichlet(cts / normalization, 5)
 
     # Add class incrementality and drops of labels
@@ -390,12 +390,13 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
 
     # For each episode, sample from the entity type distribution, and then pull a sentence with that entity type.
     # Cycle through the episodes so we can get as close to the intended distribution as possible.
-    total_size = len(train_data) / 1.7
+    size_divider = {5: 1.7, 1: 1.75, 10: 1.65}
+    total_size = len(train_data) / size_divider[c]
     train_splits = create_splits(entity_types_to_json_elts, entity_distribs, sorted_entities, total_size)
 
     # Save the train data
     for idx, split in enumerate(train_splits):
-        with open(os.path.join(out_dir, "so_train_%d.json" % (idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_%d_train_%d.json" % (c, idx + 1)), 'w') as f:
             json.dump(sorted(split, key=lambda x: int(x["id"])), f)
 
     # Save all the train data together, for running the baseline
@@ -406,7 +407,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     for split in train_splits:
         train_data.extend(split)
     for idx in range(len(train_splits)):
-        with open(os.path.join(out_dir, "so_train_all_%d.json" % (idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_%d_train_all_%d.json" % (c, idx + 1)), 'w') as f:
             json.dump(sorted(train_data, key=lambda x: int(x["id"])), f)
 
     # Sample the test data according to a slightly perturbed version of the training data
@@ -420,7 +421,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     test_splits = create_splits(entity_types_to_json_elts_test, entity_distribs, sorted_entities, total_size)
 
     for idx, split in enumerate(test_splits):
-        with open(os.path.join(out_dir, "so_test_%d.json" % (idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_%d_test_%d.json" % (c, idx + 1)), 'w') as f:
             json.dump(split, f)
 
     return curr_id, sentence_ct, skipped_annotated, label_set
@@ -570,19 +571,20 @@ def plot_all_entity_pies(data_loc):
     print("entity_colors")
     print(entity_colors)
 
-    entity_cts_by_ep = {"train": [], "test": []}
+    entity_cts_by_ep = {x: {"train": [], "test": []} for x in [1, 5, 10]}
     entity_cts_by_ep_unif = {"train": [], "test": []}
     entity_cts_by_ep_temporal = {"train": [], "test": []}
     all_entity_types = set()
     for episode in range(1, 6):
         for train_test in ["train", "test"]:
-            with open(os.path.join(data_loc, "so_%s_%d.json" % (train_test, episode)), 'r') as f:
-                data = json.load(f)
-            entity_cts = count_entities(data)
-            entity_cts_by_ep[train_test].append(entity_cts)
-            all_entity_types |= set(entity_cts.keys())
-            # sorted_entities = sorted(list(entity_cts.keys()))
-            plot_entity_pie(entity_cts, episode, train_test, entity_list, entity_colors, data_loc)
+            for c in [1, 5, 10]:
+                with open(os.path.join(data_loc, "so_%d_%s_%d.json" % (c, train_test, episode)), 'r') as f:
+                    data = json.load(f)
+                entity_cts = count_entities(data)
+                entity_cts_by_ep[c][train_test].append(entity_cts)
+                all_entity_types |= set(entity_cts.keys())
+                # sorted_entities = sorted(list(entity_cts.keys()))
+                # plot_entity_pie(entity_cts, episode, train_test, entity_list, entity_colors, data_loc)
 
             with open(os.path.join(data_loc, "so_%s_uniform_%d.json" % (train_test, episode)), 'r') as f:
                 data = json.load(f)
@@ -600,7 +602,8 @@ def plot_all_entity_pies(data_loc):
             plot_entity_pie(entity_cts, episode, train_test + "_temporal", entity_list, entity_colors, data_loc)
 
     print("skewed entity distribs")
-    analyze_entity_distribs(entity_cts_by_ep, entity_list)
+    for c in [1, 5, 10]:
+        analyze_entity_distribs(entity_cts_by_ep[c], entity_list)
     print("temporal entity distribs")
     analyze_entity_distribs(entity_cts_by_ep_temporal, entity_list)
 
@@ -723,14 +726,15 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir, np_gen):
     print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
     print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
-    print("skewed dataset")
+    print("skewed datasets")
 
-    sentence_ct = 0
-    curr_id, sentence_ct, skipped_annotated, label_set_1 = \
-        construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated, np_gen)
+    for c in [5, 1, 10]:
+        sentence_ct = 0
+        curr_id, sentence_ct, skipped_annotated, label_set_1 = \
+            construct_skewed_dataset(labeled_data_files, out_dir, label_set, curr_id, sentence_ct, skipped_annotated, np_gen, c)
 
-    print("Number of annotated sentences: %d" % sentence_ct)
-    print("Number of annotated sentences skipped: %d" % skipped_annotated)
+        print("Number of annotated sentences: %d" % sentence_ct)
+        print("Number of annotated sentences skipped: %d" % skipped_annotated)
     # print("Number of sentences skipped in XML dump: %d" % skipped_sentences)
     # print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
@@ -773,6 +777,6 @@ if __name__ == "__main__":
     np_gen = np.random.default_rng(seed=31415)
     np.random.seed(31415)
 
-    create_all_datasets(args.xml_dump_dir, args.labeled_data_dir, args.json_dir, np_gen)
+    # create_all_datasets(args.xml_dump_dir, args.labeled_data_dir, args.json_dir, np_gen)
     plot_all_entity_pies(args.json_dir)
     # plot_percentage_change_over_episodes()
