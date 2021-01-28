@@ -22,7 +22,7 @@ python test.py --data_dir $DATA_DIR \
     --tasks $ORDER --n_train_epochs $NUM_EPS --top_k_lm 20 --top_k_ner 20 \
     --lm_lambda $LAM --gen_lm_sample_percentage $GEN_PER \
     --label_map_file $DATA_DIR/${LABEL_MAP_FILE_NAME} --logging_steps 100 \
-    --learning_rate $LR --use_crf --fp32 --test_last_only &
+    --learning_rate $LR --use_crf --fp32 --test_last_only 
 
 #    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only &
 
