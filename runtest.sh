@@ -20,7 +20,10 @@ python test.py --data_dir $DATA_DIR \
     --tasks $ORDER --n_train_epochs $NUM_EPS --top_k_lm 20 --top_k_ner 20 \
     --lm_lambda $LAM --gen_lm_sample_percentage $GEN_PER \
     --label_map_file $DATA_DIR/${LABEL_MAP_FILE_NAME} --logging_steps 100 \
-    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only &
+    --learning_rate $LR --use_crf --fp32 --test_last_only &
+
+#    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only &
+
 #    --learning_rate $LR --use_crf --fp32 --add_task_tokens --use_task_in_ner --test_last_only --ic &
 
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "wnut conll_eng" wnut_conll_labels lll
@@ -31,6 +34,8 @@ python test.py --data_dir $DATA_DIR \
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune /iesl/canvas/jpayan/Lamolrelease/models ~/Lamolrelease
 
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
+ ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
+
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_t_1 so_t_2 so_t_3 so_t_4 so_t_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
 
 # ./runtest.sh 0.25 0.2 6.25e-5 0 "so_all_1 so_all_2 so_all_3 so_all_4 so_all_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
