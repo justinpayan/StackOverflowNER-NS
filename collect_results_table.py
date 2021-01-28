@@ -151,10 +151,9 @@ def make_plots(r):
     plt.savefig("ep_1_time.png")
 
 
-def make_plots_all_tests(r, on_train):
+def make_plots_all_tests(r, on_train, ep_type):
     linestyles = {"No Replay": "--", "Real Replay": "-", "Baseline": ":"}
     relabels = {"No Replay": "CL without Replay", "Real Replay": "CL with Real Replay", "Baseline": "Baseline (non-CL)"}
-    ep_type = "Skewed"
     color_map={"No Replay": "royalblue", "Real Replay": "darkorange", "Baseline": "forestgreen"}
     plt.clf()
     for train_setting in ["No Replay", "Real Replay", "Baseline"]:
@@ -167,13 +166,13 @@ def make_plots_all_tests(r, on_train):
         plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
         plt.ylabel("Train F1", fontsize="large")
         plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
-        plt.savefig("skewed_tests_on_train_over_time.png")
+        plt.savefig("%s_tests_on_train_over_time.png" % ep_type)
     else:
         plt.xlabel("Test Episode", fontsize="large")
         plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
         plt.ylabel("Test F1", fontsize="large")
         plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
-        plt.savefig("skewed_tests_over_time.png")
+        plt.savefig("%s_tests_over_time.png" % ep_type)
 
 
 if __name__ == "__main__":
@@ -182,12 +181,13 @@ if __name__ == "__main__":
     all_results, ep_1_over_time, test_on_train_all_eps = collect_results(args.results_dir)
     print_table(all_results)
     make_plots(ep_1_over_time)
-    make_plots_all_tests(test_on_train_all_eps, True)
+    make_plots_all_tests(test_on_train_all_eps, True, "Skewed")
+    make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
 
-    test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
-                                 'No Replay': [52.77, 55.69, 49.85, 47.94, 50.39],
-                                 'Real Replay': [51.17, 52.23, 50.6, 44.27, 49.48]},
-                    'Skewed': {'Baseline': [45.81, 48.08, 51.29, 57.1, 56.56],
-                               'No Replay': [30.59, 43.92, 45.57, 53.39, 51.3],
-                               'Real Replay': [43.52, 45.26, 46.01, 57.31, 52.63]}}
-    make_plots_all_tests(test_all_eps, False)
+    # test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
+    #                              'No Replay': [52.77, 55.69, 49.85, 47.94, 50.39],
+    #                              'Real Replay': [51.17, 52.23, 50.6, 44.27, 49.48]},
+    #                 'Skewed': {'Baseline': [45.81, 48.08, 51.29, 57.1, 56.56],
+    #                            'No Replay': [30.59, 43.92, 45.57, 53.39, 51.3],
+    #                            'Real Replay': [43.52, 45.26, 46.01, 57.31, 52.63]}}
+    # make_plots_all_tests(test_all_eps, False)
