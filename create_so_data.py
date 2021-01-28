@@ -10,6 +10,7 @@ import numpy as np
 
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
+from scipy.stats import entropy
 
 punkt_param = PunktParameters()
 abbreviation = ['u.s.a', 'fig', 'etc', 'eg', 'mr', 'mrs', 'e.g', 'no', 'vs', 'i.e']
@@ -534,6 +535,30 @@ def plot_entity_pie(entity_cts, episode, train_test, sorted_entities, entity_col
     plt.clf()
 
 
+def analyze_entity_distribs(entity_cts_tr_te, entity_list):
+    for train_test in ["train", "test"]:
+        print(train_test)
+        entity_distribs = np.zeros((5, len(entity_list)))
+        for ep in range(5):
+            print(entity_cts_tr_te[train_test][ep])
+            for idx, ent in enumerate(entity_list):
+                entity_distribs[ep, idx] = entity_cts_tr_te[train_test][ep][ent]
+        entity_distribs += 1
+        entity_distribs = entity_distribs/np.sum(entity_distribs, axis=1).reshape((-1, 1))
+        print(np.sum(entity_distribs, axis=1))
+
+        # Get the pairwise KL divergence
+        kl_divs = []
+        for i in range(5):
+            for j in range(5):
+                if i != j:
+                    kl_divs.append(entropy(entity_distribs[i, :], qk=entity_distribs[j, :]))
+        print(np.min(kl_divs))
+        print(np.max(kl_divs))
+        print(np.mean(kl_divs))
+        print(np.std(kl_divs))
+
+
 def plot_all_entity_pies(data_loc):
     entity_list = get_entity_list(data_loc)
 
@@ -565,6 +590,7 @@ def plot_all_entity_pies(data_loc):
             entity_cts_by_ep_unif[train_test].append(entity_cts)
             # sorted_entities = sorted(list(entity_cts.keys()))
             plot_entity_pie(entity_cts, episode, train_test + "_uniform", entity_list, entity_colors, data_loc)
+            # analyze_entity_distribs(entity_cts_by_ep, entity_list)
 
             with open(os.path.join(data_loc, "so_temporal_%s_%d.json" % (train_test, episode)), 'r') as f:
                 data = json.load(f)
@@ -572,6 +598,12 @@ def plot_all_entity_pies(data_loc):
             entity_cts_by_ep_temporal[train_test].append(entity_cts)
             # sorted_entities = sorted(list(entity_cts.keys()))
             plot_entity_pie(entity_cts, episode, train_test + "_temporal", entity_list, entity_colors, data_loc)
+
+    print("skewed entity distribs")
+    analyze_entity_distribs(entity_cts_by_ep, entity_list)
+    print("temporal entity distribs")
+    analyze_entity_distribs(entity_cts_by_ep_temporal, entity_list)
+
 
     # Write out the entity counts by episode
     for train_test in ["train", "test"]:
@@ -718,7 +750,7 @@ def create_all_datasets(xml_dump_dir, data_dir, out_dir, np_gen):
     # print("Number of sentences loaded in XML dump: %d" % nonskipped_sentences)
 
     label_map = {}
-    for idx, l in enumerate(label_set_2):
+    for idx, l in enumerate(sorted(label_set_2)):
         label_map[l] = idx
 
     with open(os.path.join(out_dir, "so_labels"), 'w') as labelf:
