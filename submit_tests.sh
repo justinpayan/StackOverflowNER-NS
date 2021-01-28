@@ -45,8 +45,8 @@ sbatch -J test_real_t_so \
 
 
 sbatch -J test_ft_t_so \
-        -e $OUTBASE/logs/test/finetune/lamol_train_temporal.err \
-        -o $OUTBASE/logs/test/finetune/lamol_train_temporal.log \
+        -e $OUTBASE/logs/test/finetune/lamol_test_temporal.err \
+        -o $OUTBASE/logs/test/finetune/lamol_test_temporal.log \
         --mem=15G \
         --partition=m40-long \
         --time=01:00:00 \
@@ -56,8 +56,8 @@ sbatch -J test_ft_t_so \
 
 # Train on whole so temporal train set, for getting a baseline
 sbatch -J test_whole_t_so \
-        -e $OUTBASE/logs/test/finetune/lamol_train_whole_so_temporal.err \
-        -o $OUTBASE/logs/test/finetune/lamol_train_whole_so_temporal.log \
+        -e $OUTBASE/logs/test/finetune/lamol_test_whole_so_temporal.err \
+        -o $OUTBASE/logs/test/finetune/lamol_test_whole_so_temporal.log \
         --mem=15G \
         --partition=m40-long \
         --time=01:00:00 \
