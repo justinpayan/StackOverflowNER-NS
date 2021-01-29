@@ -413,302 +413,242 @@ TASK_DICT = {
     },
     "so_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
+               "n_train_epochs": 5
     },
     "so_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_2.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_2.json"),
+               "n_train_epochs": 5
     },
     "so_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_3.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_3.json"),
+               "n_train_epochs": 5
     },
     "so_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_4.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_4.json"),
+               "n_train_epochs": 5
     },
     "so_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_5.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_5.json"),
+               "n_train_epochs": 5
     },
     "so_1_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_1.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_1.json"),
+               "n_train_epochs": 5
     },
     "so_1_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_2.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_2.json"),
+               "n_train_epochs": 5
     },
     "so_1_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_3.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_3.json"),
+               "n_train_epochs": 5
     },
     "so_1_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_4.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_4.json"),
+               "n_train_epochs": 5
     },
     "so_1_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_5.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_5.json"),
+               "n_train_epochs": 5
     },
     "so_10_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_1.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_1.json"),
+               "n_train_epochs": 5
     },
     "so_10_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_2.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_2.json"),
+               "n_train_epochs": 5
     },
     "so_10_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_3.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_3.json"),
+               "n_train_epochs": 5
     },
     "so_10_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_4.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_4.json"),
+               "n_train_epochs": 5
     },
     "so_10_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_5.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_5.json"),
+               "n_train_epochs": 5
     },
     "so_1_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_all_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_1.json"),
                "n_train_epochs": 5
     },
     "so_1_all_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_all_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_2.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_2.json"),
                "n_train_epochs": 5
     },
     "so_1_all_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_all_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_3.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_3.json"),
                "n_train_epochs": 5
     },
     "so_1_all_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_all_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_4.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_4.json"),
                "n_train_epochs": 5
     },
     "so_1_all_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_1_train_all_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_1_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_1_train_5.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_1_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_1_test_5.json"),
                "n_train_epochs": 5
     },
     "so_10_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_all_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_1.json"),
                "n_train_epochs": 5
     },
     "so_10_all_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_all_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_2.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_2.json"),
                "n_train_epochs": 5
     },
     "so_10_all_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_all_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_3.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_3.json"),
                "n_train_epochs": 5
     },
     "so_10_all_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_all_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_4.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_4.json"),
                "n_train_epochs": 5
     },
     "so_10_all_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_10_train_all_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_10_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_10_train_5.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_10_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_10_test_5.json"),
                "n_train_epochs": 5
     },
     "so_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_train_all_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
                "n_train_epochs": 5
     },
     "so_all_2": {
                 "train": os.path.join(args.data_dir, "so_data", "so_train_all_2.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_train_2.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_train_2.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_2.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_2.json"),
                 "n_train_epochs": 5
     },
     "so_all_3": {
                 "train": os.path.join(args.data_dir, "so_data", "so_train_all_3.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_train_3.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_train_3.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_3.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_3.json"),
                 "n_train_epochs": 5
     },
     "so_all_4": {
                 "train": os.path.join(args.data_dir, "so_data", "so_train_all_4.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_train_4.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_train_4.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_4.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_4.json"),
                 "n_train_epochs": 5
     },
     "so_all_5": {
                 "train": os.path.join(args.data_dir, "so_data", "so_train_all_5.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_train_5.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_train_5.json"),
-                "n_train_epochs": 5
-    },
-    "so_u_1": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
-               "n_train_epochs": 25
-    },
-    "so_u_2": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
-               "n_train_epochs": 25
-    },
-    "so_u_3": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
-               "n_train_epochs": 25
-    },
-    "so_u_4": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
-               "n_train_epochs": 25
-    },
-    "so_u_5": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_uniform_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
-               "n_train_epochs": 25
-    },
-    "so_u_all_1": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_1.json"),
-               "n_train_epochs": 5
-    },
-    "so_u_all_2": {
-                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_2.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_2.json"),
-                "n_train_epochs": 5
-    },
-    "so_u_all_3": {
-                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_3.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_3.json"),
-                "n_train_epochs": 5
-    },
-    "so_u_all_4": {
-                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_4.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_4.json"),
-                "n_train_epochs": 5
-    },
-    "so_u_all_5": {
-                "train": os.path.join(args.data_dir, "so_data", "so_train_all_uniform_5.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_test_uniform_5.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_test_5.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_test_5.json"),
                 "n_train_epochs": 5
     },
     "so_t_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_1.json"),
+               "n_train_epochs": 5
     },
     "so_t_2": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_2.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_2.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_2.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_2.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_2.json"),
+               "n_train_epochs": 5
     },
     "so_t_3": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_3.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_3.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_3.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_3.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_3.json"),
+               "n_train_epochs": 5
     },
     "so_t_4": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_4.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_4.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_4.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_4.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_4.json"),
+               "n_train_epochs": 5
     },
     "so_t_5": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_5.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_5.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_5.json"),
-               "n_train_epochs": 25
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_5.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_5.json"),
+               "n_train_epochs": 5
     },
     "so_t_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_all_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_1.json"),
                "n_train_epochs": 5
     },
     "so_t_all_2": {
                 "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_all_2.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_2.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_2.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_2.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_2.json"),
                 "n_train_epochs": 5
     },
     "so_t_all_3": {
                 "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_all_3.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_3.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_3.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_3.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_3.json"),
                 "n_train_epochs": 5
     },
     "so_t_all_4": {
                 "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_all_4.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_4.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_4.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_4.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_4.json"),
                 "n_train_epochs": 5
     },
     "so_t_all_5": {
                 "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_all_5.json"),
-                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_train_5.json"),
-                "test": os.path.join(args.data_dir, "so_data", "so_temporal_train_5.json"),
+                "eval": os.path.join(args.data_dir, "so_data", "so_temporal_test_5.json"),
+                "test": os.path.join(args.data_dir, "so_data", "so_temporal_test_5.json"),
                 "n_train_epochs": 5
     }
 }
