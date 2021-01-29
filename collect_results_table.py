@@ -102,30 +102,29 @@ def collect_results(results_dir):
                                        "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
     results_ep_5_train_all_eps_test_agg_over_time = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+                                                     "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                                     "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                                     "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
-    results_all_eps_train_ep_1_test = {"Temporal": { "No Replay": [], "Real Replay": []},
-                                       "Skewed_1": { "No Replay": [], "Real Replay": []},
-                                       "Skewed_5": { "No Replay": [], "Real Replay": []},
-                                       "Skewed_10": { "No Replay": [], "Real Replay": []}}
-
+    results_all_eps_train_ep_1_test = {"Temporal": {"No Replay": [], "Real Replay": []},
+                                       "Skewed_1": {"No Replay": [], "Real Replay": []},
+                                       "Skewed_5": {"No Replay": [], "Real Replay": []},
+                                       "Skewed_10": {"No Replay": [], "Real Replay": []}}
 
     # subdirs = {"Temporal":
     #                {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner",
     #                "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_tasksner",
-    #                "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"},
+    #                "Real Replay":
+    #                "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"},
     #            "Skewed":
     #                {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5_tasksner",
     #                 "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5_tasksner",
     #                 "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"}}
 
-
     subdirs = {"Temporal":
                    {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5",
-                   "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
-                   "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
+                    "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
+                    "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
                "Skewed_1":
                    {"Baseline": "finetune/so_1_all_1_so_1_all_2_so_1_all_3_so_1_all_4_so_1_all_5",
                     "No Replay": "finetune/so_1_1_so_1_2_so_1_3_so_1_4_so_1_5",
@@ -133,7 +132,7 @@ def collect_results(results_dir):
                "Skewed_5":
                    {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
                     "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5",
-                    "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"}
+                    "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"},
                "Skewed_10":
                    {"Baseline": "finetune/so_10_all_1_so_10_all_2_so_10_all_3_so_10_all_4_so_10_all_5",
                     "No Replay": "finetune/so_10_1_so_10_2_so_10_3_so_10_4_so_10_5",
@@ -180,7 +179,7 @@ def print_table(r):
 def make_plots_all_tests(r, on_train, ep_type):
     linestyles = {"No Replay": "--", "Real Replay": "-", "Baseline": ":"}
     relabels = {"No Replay": "CL without Replay", "Real Replay": "CL with Real Replay", "Baseline": "Baseline (non-CL)"}
-    color_map={"No Replay": "royalblue", "Real Replay": "darkorange", "Baseline": "forestgreen"}
+    color_map = {"No Replay": "royalblue", "Real Replay": "darkorange", "Baseline": "forestgreen"}
     plt.clf()
     for train_setting in ["Baseline", "Real Replay", "No Replay"]:
         plt.plot(r[ep_type][train_setting],
