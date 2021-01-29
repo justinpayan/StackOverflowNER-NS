@@ -4,9 +4,9 @@ TIME=$1
 
 OUTBASE=/mnt/nfs/scratch1/jpayan/Lamolrelease
 
-mkdir -p $OUTBASE/logs/${TIME}/train/lll
-mkdir -p $OUTBASE/logs/${TIME}/train/real
-mkdir -p $OUTBASE/logs/${TIME}/train/finetune
+mkdir -p $OUTBASE/logs/${TIME}/test/lll
+mkdir -p $OUTBASE/logs/${TIME}/test/real
+mkdir -p $OUTBASE/logs/${TIME}/test/finetune
 
 sbatch -J test_real_so \
         -e $OUTBASE/logs/${TIME}/test/real/lamol_test.err \
