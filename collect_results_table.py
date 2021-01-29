@@ -97,24 +97,50 @@ def get_results_one_setting_agg_over_time(results_location):
 
 def collect_results(results_dir):
     results_ep_5_train_all_eps_test = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+                                       "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                       "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                       "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
     results_ep_5_train_all_eps_test_agg_over_time = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                                     "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+                                       "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                       "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                       "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
-    results_all_eps_train_ep_1_test = {"Temporal": {"No Replay": [], "Real Replay": []},
-                                       "Skewed": {"No Replay": [], "Real Replay": []}}
+    results_all_eps_train_ep_1_test = {"Temporal": { "No Replay": [], "Real Replay": []},
+                                       "Skewed_1": { "No Replay": [], "Real Replay": []},
+                                       "Skewed_5": { "No Replay": [], "Real Replay": []},
+                                       "Skewed_10": { "No Replay": [], "Real Replay": []}}
+
+
+    # subdirs = {"Temporal":
+    #                {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner",
+    #                "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_tasksner",
+    #                "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"},
+    #            "Skewed":
+    #                {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5_tasksner",
+    #                 "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5_tasksner",
+    #                 "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"}}
+
 
     subdirs = {"Temporal":
-                   {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner",
-                   "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_tasksner",
-                   "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"},
-               "Skewed":
-                   {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5_tasksner",
-                    "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5_tasksner",
-                    "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"}}
+                   {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5",
+                   "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
+                   "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
+               "Skewed_1":
+                   {"Baseline": "finetune/so_1_all_1_so_1_all_2_so_1_all_3_so_1_all_4_so_1_all_5",
+                    "No Replay": "finetune/so_1_1_so_1_2_so_1_3_so_1_4_so_1_5",
+                    "Real Replay": "lll/so_1_1_so_1_2_so_1_3_so_1_4_so_1_5_0.2_0.25_6.25e-05_real_improvedgen"},
+               "Skewed_5":
+                   {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
+                    "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5",
+                    "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"}
+               "Skewed_10":
+                   {"Baseline": "finetune/so_10_all_1_so_10_all_2_so_10_all_3_so_10_all_4_so_10_all_5",
+                    "No Replay": "finetune/so_10_1_so_10_2_so_10_3_so_10_4_so_10_5",
+                    "Real Replay": "lll/so_10_1_so_10_2_so_10_3_so_10_4_so_10_5_0.2_0.25_6.25e-05_real_improvedgen"}
+               }
 
-    for ep_type in ["Temporal", "Skewed"]:
+    for ep_type in ["Temporal", "Skewed_1", "Skewed_5", "Skewed_10"]:
         for train_setting in ["Baseline", "No Replay", "Real Replay"]:
             results_location = os.path.join(results_dir, subdirs[ep_type][train_setting])
             results_ep_5_train_all_eps_test[ep_type][train_setting] = get_results_one_setting(results_location)
@@ -127,28 +153,28 @@ def collect_results(results_dir):
 
 
 def print_table(r):
-    for ep_type in ["Temporal", "Skewed"]:
+    for ep_type in ["Temporal", "Skewed_1", "Skewed_5", "Skewed_10"]:
         print("& Baseline & " + " & ".join(["%.3f" % i for i in r[ep_type]["Baseline"]]) + "\\\\")
         print(ep_type + " & No Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["No Replay"]]) + "\\\\")
         print("& Real Replay & " + " & ".join(["%.3f" % i for i in r[ep_type]["Real Replay"]]) + "\\\\")
         print("\\midrule")
 
 
-def make_plots(r):
-    markers = {"Temporal": "o", "Skewed": "x"}
-    linestyles = {"No Replay": "--", "Real Replay": "-"}
-    for ep_type in ["Temporal", "Skewed"]:
-        for train_setting in ["No Replay", "Real Replay"]:
-            plt.plot(r[ep_type][train_setting],
-                     marker=markers[ep_type],
-                     linestyle=linestyles[train_setting],
-                     color="k",
-                     label="%s - %s" % (ep_type, train_setting))
-    plt.xlabel("Episode", fontsize="medium")
-    plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
-    plt.ylabel("Episode 1 Test F1", fontsize="medium")
-    plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
-    plt.savefig("ep_1_time.png")
+# def make_plots(r):
+#     markers = {"Temporal": "o", "Skewed": "x"}
+#     linestyles = {"No Replay": "--", "Real Replay": "-"}
+#     for ep_type in ["Temporal", "Skewed"]:
+#         for train_setting in ["No Replay", "Real Replay"]:
+#             plt.plot(r[ep_type][train_setting],
+#                      marker=markers[ep_type],
+#                      linestyle=linestyles[train_setting],
+#                      color="k",
+#                      label="%s - %s" % (ep_type, train_setting))
+#     plt.xlabel("Episode", fontsize="medium")
+#     plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
+#     plt.ylabel("Episode 1 Test F1", fontsize="medium")
+#     plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
+#     plt.savefig("ep_1_time.png")
 
 
 def make_plots_all_tests(r, on_train, ep_type):
@@ -180,8 +206,11 @@ if __name__ == "__main__":
 
     all_results, ep_1_over_time, test_on_train_all_eps = collect_results(args.results_dir)
     print_table(all_results)
-    make_plots(ep_1_over_time)
-    make_plots_all_tests(test_on_train_all_eps, True, "Skewed")
+    # make_plots(ep_1_over_time)
+    print(test_on_train_all_eps)
+    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_1")
+    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_5")
+    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_10")
     make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
 
     # test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
