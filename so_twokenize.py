@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Small Edits by: Justin Payan <jpayan@cs.umass.edu>
 Original Author: Jeniya Tabassum <jeniya.tabassum@gmail.com>
 stokenizer -- a tokenizer designed for StackOverflow text.
 This tokenizer is build on top of a tweet tokenizer : https://github.com/myleott/ark-twokenize-py/blob/master/twokenize.py
@@ -953,7 +952,6 @@ def tokenize(text):
     # print("starting so wrapper")
     tokens_wrapped = SO_Tokenizer_wrapper(tokens_unmasked)
 
-    # added by justin payan
     tokens_wrapped = (" ".join(tokens_wrapped)).split(" ")
     if tokens_wrapped[-1] == "..":
         tokens_wrapped = tokens_wrapped[:-1]

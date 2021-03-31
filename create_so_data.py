@@ -653,11 +653,11 @@ def plot_average_percent_over_episodes(up_or_down, entities, train_test, entity_
     ax.legend()
     plt.tight_layout()
     name = "percent_of_ep_1_%s_%s" % (up_or_down, train_test)
-    plt.savefig("/Users/juspayan/plots/%s.png" % name)
+    plt.savefig("plots/%s.png" % name)
 
 
 def plot_percentage_change_over_episodes():
-    data_loc = "/Users/juspayan/Downloads"
+    data_loc = "Downloads"
     for train_test in ["train", "test"]:
         entity_percent_by_episode = defaultdict(list)
         for episode in range(1, 6):
@@ -771,6 +771,8 @@ def parse_args():
 
 
 if __name__ == "__main__":
+    print("You need to download the StackOverflow Posts.xml from https://archive.org/details/stackexchange,"
+          "then also run create_xml_dump.py first!")
     args = parse_args()
 
     random.seed(31415)
