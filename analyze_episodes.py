@@ -51,4 +51,4 @@ if __name__ == "__main__":
 
     with open(out_path, 'w') as f:
         for idx in sorted(set(wrong_second.keys()) - set(wrong_first.keys())):
-            f.write(str(wrong_second[idx]) + "\n")
+            f.write(''.join(wrong_second[idx]) + "\n")
