@@ -15,7 +15,7 @@ sbatch -J test_real_so \
         --partition=m40-short \
         --time=01:00:00 \
         --gres=gpu:1 \
-        ./runtestreal.sh 0.25 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels $OUTBASE/models/${TIME} ~/Lamolrelease
+        ./runtestreal.sh 0.25 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels $OUTBASE/models ~/Lamolrelease
 
 sbatch -J test_ft_so \
         -e $OUTBASE/logs/${TIME}/test/finetune/lamol_test.err \
