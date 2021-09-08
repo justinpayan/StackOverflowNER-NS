@@ -2,8 +2,11 @@ import argparse
 import os
 import re
 
+import json
 import matplotlib.pyplot as plt
 import numpy as np
+
+from collections import Counter
 
 
 all_types = ["accuracy", "Algorithm", "Application", "Class_Name", "Code_Block", "Data_Structure", "Data_Type",
@@ -219,8 +222,34 @@ if __name__ == "__main__":
     results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"
     skew_replay = get_results_one_setting(results_location)
 
-    results_table = np.array([temp_baseline, temp_no_replay, temp_replay,
-                              skew_baseline, skew_no_replay, skew_replay]).transpose()
+    temporal_type_cts = Counter()
+    for i in range(1, 6):
+        with open("/home/jpayan/Lamolrelease/so_data/so_temporal_test_%d.json" % i) as f:
+            testset = json.load(f)
+            for ex in testset:
+                for tag in ex["tag_sequence"].strip().split():
+                    if tag.startswith("B"):
+                        temporal_type_cts[tag[2:]] += 1
+    temp_cts_list = []
+    for t in all_types:
+        temp_cts_list.append(temporal_type_cts[t]/5)
+    temp_cts_list.insert(0, sum(temp_cts_list))
+
+    skew_type_cts = Counter()
+    for i in range(1, 6):
+        with open("/home/jpayan/Lamolrelease/so_data/so_test_%d.json" % i) as f:
+            testset = json.load(f)
+            for ex in testset:
+                for tag in ex["tag_sequence"].strip().split():
+                    if tag.startswith("B"):
+                        skew_type_cts[tag[2:]] += 1
+    skew_cts_list = []
+    for t in all_types:
+        skew_cts_list.append(skew_type_cts[t]/5)
+    skew_cts_list.insert(0, sum(skew_cts_list))
+
+    temp_results_table = np.array([temp_baseline, temp_no_replay, temp_replay]).transpose()
+    skew_results_table = np.array([skew_baseline, skew_no_replay, skew_replay]).transpose()
 
     def map_type(ent_type):
         if ent_type == "accuracy":
@@ -230,7 +259,15 @@ if __name__ == "__main__":
 
     for i in range(len(all_types)):
         to_print = "\\small " + map_type(all_types[i])
-        to_print += " & " + " & ".join(["%.2f" % x for x in results_table[i, :]])
+        to_print += " & " + " & ".join(["%.2f" % x for x in temp_results_table[i, :]])
+        to_print += " & " + temp_cts_list[i]
+        to_print += " \\\\"
+        print(to_print)
+
+    for i in range(len(all_types)):
+        to_print = "\\small " + map_type(all_types[i])
+        to_print += " & " + " & ".join(["%.2f" % x for x in skew_results_table[i, :]])
+        to_print += " & " + skew_cts_list[i]
         to_print += " \\\\"
         print(to_print)
 
