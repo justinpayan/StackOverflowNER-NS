@@ -212,7 +212,7 @@ if __name__ == "__main__":
     temp_replay = get_results_one_setting(results_location)
 
     # Collect comprehensive results for skewed
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-02-01-11-18-03/gpt2/finetune/so_1_all_1_so_1_all_2_so_1_all_3_so_1_all_4_so_1_all_5"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-02-01-11-18-03/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5"
     skew_baseline = get_results_one_setting(results_location)
     results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-02-01-11-18-03/gpt2/finetune/so_1_so_2_so_3_so_4_so_5"
     skew_no_replay = get_results_one_setting(results_location)
