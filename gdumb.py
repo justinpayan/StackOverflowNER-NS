@@ -94,9 +94,25 @@ def gdumb_sample(rseed, k):
 
 
 if __name__ == "__main__":
+    # for k in [300, 500, 1000, 1500, 1800]:
+    #     for seed in range(10):
+    #         dset = gdumb_sample(seed, k)
+    #         for i in range(5):
+    #             with open(data_dir + "/gdumb_%d_%d_%d.json" % (k, seed, i), 'w') as f:
+    #                 json.dump(dset, f)
+
     for k in [300, 500, 1000, 1500, 1800]:
         for seed in range(10):
-            dset = gdumb_sample(seed, k)
-            for i in range(5):
-                with open(data_dir + "/gdumb_%d_%d_%d.json" % (k, seed, i), 'w') as f:
-                    json.dump(dset, f)
+            for i in range(1, 6):
+                print("\"gdumb_%d_%d_%d\": {" % (k, seed, i))
+                print("\t\"train\": os.path.join(args.data_dir, \"so_data\", \"gdumb_%d_%d_%d.json\")," % (k, seed, i))
+                print("\t\"eval\": os.path.join(args.data_dir, \"so_data\", \"so_\" + train_test + \"_%d.json\")," % i)
+                print("\t\"test\": os.path.join(args.data_dir, \"so_data\", \"so_\" + train_test + \"_%d.json\")," % i)
+                print("\t\"n_train_epochs\": 10")
+                print("},")
+    # "so_t_1": {
+    #     "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),
+    #     "eval": os.path.join(args.data_dir, "so_data", "so_temporal_" + train_test + "_1.json"),
+    #     "test": os.path.join(args.data_dir, "so_data", "so_temporal_" + train_test + "_1.json"),
+    #     "n_train_epochs": 10
+    # },
