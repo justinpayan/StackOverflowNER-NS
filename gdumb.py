@@ -97,5 +97,6 @@ if __name__ == "__main__":
     for k in [300, 500, 1000, 1500, 1800]:
         for seed in range(10):
             dset = gdumb_sample(seed, k)
-            with open(data_dir + "/gdumb_%d_%d.json" % (k, seed), 'w') as f:
-                json.dump(dset, f)
+            for i in range(5):
+                with open(data_dir + "/gdumb_%d_%d_%d.json" % (k, seed, i), 'w') as f:
+                    json.dump(dset, f)
