@@ -105,7 +105,7 @@ mkdir -p $OUTBASE/logs/${TIME}/train/finetune
 #          finetune $OUTBASE/models/${TIME} ~/Lamolrelease
 #done
 
-for k in 300 500 1000 1500 1800; do
+for k in 500 1000 1500; do
   for seed in {0..9}; do
     sbatch -J gdumb_${k}_${seed} \
     -e $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_${k}_${seed}.err \
