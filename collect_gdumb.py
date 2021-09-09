@@ -27,7 +27,7 @@ def list_results(file_name):
         fscore = None
         for l in lines:
             l = l.strip()
-            if l.startswith(which_result):
+            if l.startswith(which_result + ":"):
                 fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
                 results.append(fscore)
         if fscore is None:

@@ -27,7 +27,7 @@ def list_results(file_name):
         fscore = None
         for l in lines:
             l = l.strip()
-            if l.startswith(which_result):
+            if l.startswith(which_result + ":"):
                 fscore = float(re.search("FB1:\s*(\d+\.\d+)", l).group(1))
                 results.append(fscore)
         if fscore is None:
@@ -207,17 +207,17 @@ if __name__ == "__main__":
     # make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
 
     # Collect comprehensive results for temporal
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5"
     temp_baseline = get_results_one_setting(results_location)
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_tasksner"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5"
     temp_no_replay = get_results_one_setting(results_location)
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"
     temp_replay = get_results_one_setting(results_location)
 
     # Collect comprehensive results for skewed
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-02-01-11-18-03/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5"
     skew_baseline = get_results_one_setting(results_location)
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_1_so_2_so_3_so_4_so_5"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-02-01-11-18-03/gpt2/finetune/so_1_so_2_so_3_so_4_so_5"
     skew_no_replay = get_results_one_setting(results_location)
     results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"
     skew_replay = get_results_one_setting(results_location)
