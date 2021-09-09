@@ -75,7 +75,7 @@ def gdumb_sample(rseed, k):
     sig_list = []
     label_cts = Counter()
     for ep in range(1, 6):
-        with open(data_dir + ("/so_train_%d.json" % ep), 'r') as f:
+        with open(data_dir + ("/so_temporal_train_%d.json" % ep), 'r') as f:
             ep_dset = json.load(f)
             ep_dset = sorted(ep_dset, key=lambda x: random.random())
             for example in ep_dset:
@@ -84,12 +84,12 @@ def gdumb_sample(rseed, k):
                 if should_add(signature, label_cts, num_exs_per_label):
                     dset, label_cts, sig_list = add_to_dset(example, signature, dset, label_cts, sig_list, k)
 
-    print("%d unique labels found" % len(label_cts))
-    print("%d unique labels in dset" % len([v for _, v in label_cts.items() if v]))
-    sorted_labels = sorted(label_cts.items(), key=lambda x: x[1])
-    print(sorted_labels)
-    print("%d is max number of examples for a label (%s)" % (sorted_labels[-1][1], sorted_labels[-1][0]))
-    print("%d is min number of examples for a label (%s)" % (sorted_labels[0][1], sorted_labels[0][0]))
+    # print("%d unique labels found" % len(label_cts))
+    # print("%d unique labels in dset" % len([v for _, v in label_cts.items() if v]))
+    # sorted_labels = sorted(label_cts.items(), key=lambda x: x[1])
+    # print(sorted_labels)
+    # print("%d is max number of examples for a label (%s)" % (sorted_labels[-1][1], sorted_labels[-1][0]))
+    # print("%d is min number of examples for a label (%s)" % (sorted_labels[0][1], sorted_labels[0][0]))
     return dset
 
 
@@ -98,19 +98,19 @@ if __name__ == "__main__":
         for seed in range(10):
             dset = gdumb_sample(seed, k)
             for i in range(1, 6):
-                with open(data_dir + "/gdumb_%d_%d_%d.json" % (k, seed, i), 'w') as f:
+                with open(data_dir + "/gdumb_t_%d_%d_%d.json" % (k, seed, i), 'w') as f:
                     json.dump(dset, f)
 
     # Use this code to generate the dictionary items that go in settings.py
-    # for k in [300, 500, 1000, 1500, 1800]:
-    #     for seed in range(10):
-    #         for i in range(1, 6):
-    #             print("\"gdumb_%d_%d_%d\": {" % (k, seed, i))
-    #             print("\t\"train\": os.path.join(args.data_dir, \"so_data\", \"gdumb_%d_%d_%d.json\")," % (k, seed, i))
-    #             print("\t\"eval\": os.path.join(args.data_dir, \"so_data\", \"so_\" + train_test + \"_%d.json\")," % i)
-    #             print("\t\"test\": os.path.join(args.data_dir, \"so_data\", \"so_\" + train_test + \"_%d.json\")," % i)
-    #             print("\t\"n_train_epochs\": 10")
-    #             print("},")
+    for k in [300, 500, 1000, 1500, 1800]:
+        for seed in range(10):
+            for i in range(1, 6):
+                print("\"gdumb_t_%d_%d_%d\": {" % (k, seed, i))
+                print("\t\"train\": os.path.join(args.data_dir, \"so_data\", \"gdumb_t_%d_%d_%d.json\")," % (k, seed, i))
+                print("\t\"eval\": os.path.join(args.data_dir, \"so_data\", \"so_temporal_\" + train_test + \"_%d.json\")," % i)
+                print("\t\"test\": os.path.join(args.data_dir, \"so_data\", \"so_temporal_\" + train_test + \"_%d.json\")," % i)
+                print("\t\"n_train_epochs\": 10")
+                print("},")
 
     # "so_t_1": {
     #     "train": os.path.join(args.data_dir, "so_data", "so_temporal_train_1.json"),

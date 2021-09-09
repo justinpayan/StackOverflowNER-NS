@@ -104,17 +104,32 @@ mkdir -p $OUTBASE/logs/${TIME}/train/finetune
 #          ./setupandrunexp.sh 0.25 0.2 $LR $NUM_EPS "so_${C}_all_1 so_${C}_all_2 so_${C}_all_3 so_${C}_all_4 so_${C}_all_5" so_data/so_labels \
 #          finetune $OUTBASE/models/${TIME} ~/Lamolrelease
 #done
+#
+#for k in 500 1000 1500; do
+#  for seed in {0..9}; do
+#    sbatch -J gdumb_${k}_${seed} \
+#    -e $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_${k}_${seed}.err \
+#    -o $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_${k}_${seed}.log \
+#    --mem=15G \
+#    --partition=m40-long \
+#    --time=01-00:00:00 \
+#    --gres=gpu:1 \
+#    ./setupandrunexp.sh 0.25 0.2 $LR $NUM_EPS "gdumb_${k}_${seed}_1 gdumb_${k}_${seed}_2 gdumb_${k}_${seed}_3 gdumb_${k}_${seed}_4 gdumb_${k}_${seed}_5" so_data/so_labels \
+#    finetune $OUTBASE/models/${TIME} ~/Lamolrelease
+#  done
+#done
+
 
 for k in 500 1000 1500; do
   for seed in {0..9}; do
-    sbatch -J gdumb_${k}_${seed} \
-    -e $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_${k}_${seed}.err \
-    -o $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_${k}_${seed}.log \
+    sbatch -J gdumb_t_${k}_${seed} \
+    -e $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_t_${k}_${seed}.err \
+    -o $OUTBASE/logs/${TIME}/train/finetune/lamol_train_whole_gdumb_t_${k}_${seed}.log \
     --mem=15G \
     --partition=m40-long \
     --time=01-00:00:00 \
     --gres=gpu:1 \
-    ./setupandrunexp.sh 0.25 0.2 $LR $NUM_EPS "gdumb_${k}_${seed}_1 gdumb_${k}_${seed}_2 gdumb_${k}_${seed}_3 gdumb_${k}_${seed}_4 gdumb_${k}_${seed}_5" so_data/so_labels \
+    ./setupandrunexp.sh 0.25 0.2 $LR $NUM_EPS "gdumb_t_${k}_${seed}_1 gdumb_t_${k}_${seed}_2 gdumb_t_${k}_${seed}_3 gdumb_t_${k}_${seed}_4 gdumb_t_${k}_${seed}_5" so_data/so_labels \
     finetune $OUTBASE/models/${TIME} ~/Lamolrelease
   done
 done
