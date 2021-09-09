@@ -93,7 +93,7 @@ def test_one_to_one(task_load, task_eval, model, score_dict):
     model_dir = model.model_dir
     conll_score_in_file = os.path.join(model_dir, "ner_conll_score_in_{}_{}".format(task_eval, "finish"))
 
-    if task_eval in ['conll_eng', 'wnut', 'wnut_O'] or task_eval.startswith("so"):
+    if task_eval in ['conll_eng', 'wnut', 'wnut_O'] or task_eval.startswith("so") or task_eval.startswith("gdumb"):
         with open(conll_score_in_file, 'w') as f:
             for original, pred, _y in ner_results:
                 for o, p, y in zip(original, pred, _y):
