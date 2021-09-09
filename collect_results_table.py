@@ -173,7 +173,9 @@ def make_plots_all_tests(r, on_train, ep_type):
         plt.plot(r[ep_type][train_setting],
                  linestyle=linestyles[train_setting],
                  color=color_map[train_setting],
+                 marker='o',
                  label=relabels[train_setting])
+        plt.ylim(ymin=34,ymax=102)
     if on_train:
         plt.xlabel("Train Episode", fontsize="large")
         plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
