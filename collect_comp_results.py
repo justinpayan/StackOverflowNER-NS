@@ -248,6 +248,17 @@ if __name__ == "__main__":
         skew_cts_list.append(skew_type_cts[t]/5)
     skew_cts_list.insert(0, sum(skew_cts_list))
 
+    gdumb_results = {}
+    k = 1500
+    results_k = []
+    for seed in range(10):
+        gdumb_str = "_".join(["gdumb_%d_%d_%d" % (k, seed, i) for i in range(1, 6)])
+        results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/2021-09-08-21-05-03/gpt2/finetune/" + gdumb_str
+        results_k.append(get_results_one_setting(results_location))
+    results_k = np.array(results_k)
+    gdumb_means = np.mean(results_k, axis=0)
+    gdumb_stds = np.std(results_k, axis=0)
+
     temp_results_table = np.array([temp_baseline, temp_no_replay, temp_replay]).transpose()
     skew_results_table = np.array([skew_baseline, skew_no_replay, skew_replay]).transpose()
 
@@ -267,6 +278,7 @@ if __name__ == "__main__":
     for i in range(len(all_types)):
         to_print = "\\small " + map_type(all_types[i])
         to_print += " & " + " & ".join(["%.2f" % x for x in skew_results_table[i, :]])
+        to_print += " & %.2f \\pm %.2f" % (gdumb_means[i], gdumb_stds[i])
         to_print += (" & %.2f" % skew_cts_list[i])
         to_print += " \\\\"
         print(to_print)
