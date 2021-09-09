@@ -8,7 +8,7 @@ import numpy as np
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", default="/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2", type=str)
+    parser.add_argument("--results_dir", default="/mnt/nfs/scratch1/jpayan/Lamolrelease/models", type=str)
     args = parser.parse_args()
     return args
 
@@ -97,19 +97,14 @@ def get_results_one_setting_agg_over_time(results_location):
 
 def collect_results(results_dir):
     results_ep_5_train_all_eps_test = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                       "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+                                       "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []}}
 
     results_ep_5_train_all_eps_test_agg_over_time = {"Temporal": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                                     "Skewed_1": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                                     "Skewed_5": {"Baseline": [], "No Replay": [], "Real Replay": []},
-                                                     "Skewed_10": {"Baseline": [], "No Replay": [], "Real Replay": []}}
+                                                     "Skewed": {"Baseline": [], "No Replay": [], "Real Replay": []},
+                                                     }
 
     results_all_eps_train_ep_1_test = {"Temporal": {"No Replay": [], "Real Replay": []},
-                                       "Skewed_1": {"No Replay": [], "Real Replay": []},
-                                       "Skewed_5": {"No Replay": [], "Real Replay": []},
-                                       "Skewed_10": {"No Replay": [], "Real Replay": []}}
+                                       "Skewed": {"No Replay": [], "Real Replay": []}}
 
     # subdirs = {"Temporal":
     #                {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5_tasksner",
@@ -122,33 +117,26 @@ def collect_results(results_dir):
     #                 "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"}}
 
     subdirs = {"Temporal":
-                   {"Baseline": "finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5",
-                    "No Replay": "finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
-                    "Real Replay": "lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
-               "Skewed_1":
-                   {"Baseline": "finetune/so_1_all_1_so_1_all_2_so_1_all_3_so_1_all_4_so_1_all_5",
-                    "No Replay": "finetune/so_1_1_so_1_2_so_1_3_so_1_4_so_1_5",
-                    "Real Replay": "lll/so_1_1_so_1_2_so_1_3_so_1_4_so_1_5_0.2_0.25_6.25e-05_real_improvedgen"},
-               "Skewed_5":
-                   {"Baseline": "finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
-                    "No Replay": "finetune/so_1_so_2_so_3_so_4_so_5",
-                    "Real Replay": "lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"},
-               "Skewed_10":
-                   {"Baseline": "finetune/so_10_all_1_so_10_all_2_so_10_all_3_so_10_all_4_so_10_all_5",
-                    "No Replay": "finetune/so_10_1_so_10_2_so_10_3_so_10_4_so_10_5",
-                    "Real Replay": "lll/so_10_1_so_10_2_so_10_3_so_10_4_so_10_5_0.2_0.25_6.25e-05_real_improvedgen"}
+                   {"Baseline": "gpt2/finetune/so_t_all_1_so_t_all_2_so_t_all_3_so_t_all_4_so_t_all_5",
+                    "No Replay": "gpt2/finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
+                    "Real Replay": "gpt2/lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
+               "Skewed":
+                   {"Baseline": "2021-02-01-11-18-03/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
+                    "No Replay": "2021-02-01-11-18-03/gpt2/finetune/so_1_so_2_so_3_so_4_so_5",
+                    "Real Replay": "gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"}
                }
 
-    for ep_type in ["Temporal", "Skewed_1", "Skewed_5", "Skewed_10"]:
+    for ep_type in ["Temporal", "Skewed"]:
         for train_setting in ["Baseline", "No Replay", "Real Replay"]:
             results_location = os.path.join(results_dir, subdirs[ep_type][train_setting])
             results_ep_5_train_all_eps_test[ep_type][train_setting] = get_results_one_setting(results_location)
-            results_ep_5_train_all_eps_test_agg_over_time[ep_type][train_setting] = \
-                get_results_one_setting_agg_over_time(results_location)
-            if train_setting != "Baseline":
-                results_all_eps_train_ep_1_test[ep_type][train_setting] = get_results_ep_1(results_location)
+            # results_ep_5_train_all_eps_test_agg_over_time[ep_type][train_setting] = \
+            #     get_results_one_setting_agg_over_time(results_location)
+            # if train_setting != "Baseline":
+            #     results_all_eps_train_ep_1_test[ep_type][train_setting] = get_results_ep_1(results_location)
 
-    return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test, results_ep_5_train_all_eps_test_agg_over_time
+    return results_ep_5_train_all_eps_test
+    # return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test, results_ep_5_train_all_eps_test_agg_over_time
 
 
 def print_table(r):
@@ -203,14 +191,15 @@ def make_plots_all_tests(r, on_train, ep_type):
 if __name__ == "__main__":
     args = parse_args()
 
-    all_results, ep_1_over_time, test_on_train_all_eps = collect_results(args.results_dir)
-    print_table(all_results)
+    # all_results, ep_1_over_time, test_on_train_all_eps = collect_results(args.results_dir)
+    all_results = collect_results(args.results_dir)
+
+    # print_table(all_results)
     # make_plots(ep_1_over_time)
-    print(test_on_train_all_eps)
-    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_1")
-    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_5")
-    make_plots_all_tests(test_on_train_all_eps, True, "Skewed_10")
-    make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
+    # print(test_on_train_all_eps)
+    # make_plots_all_tests(test_on_train_all_eps, True, "Skewed_1")
+    make_plots_all_tests(all_results, True, "Skewed")
+    make_plots_all_tests(all_results, True, "Temporal")
 
     # test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
     #                              'No Replay': [52.77, 55.69, 49.85, 47.94, 50.39],
