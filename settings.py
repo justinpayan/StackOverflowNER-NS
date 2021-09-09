@@ -290,7 +290,7 @@ for task in args.tasks:
     MODEL_CONFIG.to_json_file(os.path.join(model_dir, CONFIG_NAME))
 
 
-train_test = "test"
+train_test = "train"
 
 TASK_DICT = {
     "squad1": {
