@@ -179,6 +179,7 @@ def make_plots_all_tests(r, on_train, ep_type):
         plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
         plt.ylabel("Train F1", fontsize="large")
         plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
+        plt.ylim(ymin=42)
         plt.savefig("%s_tests_on_train_over_time.png" % ep_type)
     else:
         plt.xlabel("Test Episode", fontsize="large")
