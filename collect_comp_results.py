@@ -215,11 +215,11 @@ if __name__ == "__main__":
     temp_replay = get_results_one_setting(results_location)
 
     # Collect comprehensive results for skewed
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5_tasksner"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5"
     skew_baseline = get_results_one_setting(results_location)
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_1_so_2_so_3_so_4_so_5_tasksner"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/finetune/so_1_so_2_so_3_so_4_so_5"
     skew_no_replay = get_results_one_setting(results_location)
-    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_tasksner_improvedgen"
+    results_location = "/mnt/nfs/scratch1/jpayan/Lamolrelease/models/gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"
     skew_replay = get_results_one_setting(results_location)
 
     temporal_type_cts = Counter()
