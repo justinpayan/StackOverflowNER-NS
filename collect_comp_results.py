@@ -278,7 +278,7 @@ if __name__ == "__main__":
     for i in range(len(all_types)):
         to_print = "\\small " + map_type(all_types[i])
         to_print += " & " + " & ".join(["%.2f" % x for x in skew_results_table[i, :]])
-        to_print += " & %.2f \\pm %.2f" % (gdumb_means[i], gdumb_stds[i])
+        to_print += " & $%.2f \\pm %.2f$" % (gdumb_means[i], gdumb_stds[i])
         to_print += (" & %.2f" % skew_cts_list[i])
         to_print += " \\\\"
         print(to_print)
