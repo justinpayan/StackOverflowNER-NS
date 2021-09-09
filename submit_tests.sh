@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TIME=`(date +%Y-%m-%d-%H-%M-%S)`
+TIME=$1
 
 OUTBASE=/mnt/nfs/scratch1/jpayan/Lamolrelease
 
@@ -86,7 +86,7 @@ for k in 500 1000 1500; do
             --partition=m40-short \
             --time=01:00:00 \
             --gres=gpu:1 \
-             ./runtest.sh 0.25 0.2 6.25e-5 0 "gdumb_${k}_${seed}_1 gdumb_${k}_${seed}_2 gdumb_${k}_${seed}_3 gdumb_${k}_${seed}_4 gdumb_${k}_${seed}_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
+             ./runtest.sh 0.25 0.2 6.25e-5 0 "gdumb_${k}_${seed}_1 gdumb_${k}_${seed}_2 gdumb_${k}_${seed}_3 gdumb_${k}_${seed}_4 gdumb_${k}_${seed}_5" so_data/so_labels finetune $OUTBASE/models/${TIME} ~/Lamolrelease
   done
 done
 
