@@ -24,7 +24,7 @@ sbatch -J test_ft_so \
         --partition=m40-short \
         --time=01:00:00 \
         --gres=gpu:1 \
-        ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
+        ./runtest.sh 0.25 0.2 6.25e-5 0 "so_1 so_2 so_3 so_4 so_5" so_data/so_labels finetune $OUTBASE/models/${TIME} ~/Lamolrelease
 
 # Train on whole so train set, for getting a baseline
 sbatch -J test_base_so \
@@ -34,7 +34,7 @@ sbatch -J test_base_so \
         --partition=m40-short \
         --time=01:00:00 \
         --gres=gpu:1 \
-        ./runtest.sh 0.25 0.2 6.25e-5 0 "so_all_1 so_all_2 so_all_3 so_all_4 so_all_5" so_data/so_labels finetune $OUTBASE/models ~/Lamolrelease
+        ./runtest.sh 0.25 0.2 6.25e-5 0 "so_all_1 so_all_2 so_all_3 so_all_4 so_all_5" so_data/so_labels finetune $OUTBASE/models/${TIME} ~/Lamolrelease
 
 sbatch -J test_real_t_so \
         -e $OUTBASE/logs/${TIME}/test/real/lamol_test_temporal.err \
