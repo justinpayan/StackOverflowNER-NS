@@ -130,12 +130,12 @@ def collect_results(results_dir):
         for train_setting in ["Baseline", "No Replay", "Real Replay"]:
             results_location = os.path.join(results_dir, subdirs[ep_type][train_setting])
             results_ep_5_train_all_eps_test[ep_type][train_setting] = get_results_one_setting(results_location)
-            # results_ep_5_train_all_eps_test_agg_over_time[ep_type][train_setting] = \
-            #     get_results_one_setting_agg_over_time(results_location)
+            results_ep_5_train_all_eps_test_agg_over_time[ep_type][train_setting] = \
+                get_results_one_setting_agg_over_time(results_location)
             # if train_setting != "Baseline":
             #     results_all_eps_train_ep_1_test[ep_type][train_setting] = get_results_ep_1(results_location)
 
-    return results_ep_5_train_all_eps_test
+    return results_ep_5_train_all_eps_test, results_ep_5_train_all_eps_test_agg_over_time
     # return results_ep_5_train_all_eps_test, results_all_eps_train_ep_1_test, results_ep_5_train_all_eps_test_agg_over_time
 
 
@@ -192,14 +192,14 @@ if __name__ == "__main__":
     args = parse_args()
 
     # all_results, ep_1_over_time, test_on_train_all_eps = collect_results(args.results_dir)
-    all_results = collect_results(args.results_dir)
+    all_results, test_on_train_all_eps = collect_results(args.results_dir)
 
     # print_table(all_results)
     # make_plots(ep_1_over_time)
     # print(test_on_train_all_eps)
     # make_plots_all_tests(test_on_train_all_eps, True, "Skewed_1")
-    make_plots_all_tests(all_results, True, "Skewed")
-    make_plots_all_tests(all_results, True, "Temporal")
+    make_plots_all_tests(test_on_train_all_eps, True, "Skewed")
+    make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
 
     # test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
     #                              'No Replay': [52.77, 55.69, 49.85, 47.94, 50.39],
