@@ -121,8 +121,8 @@ def collect_results(results_dir):
                     "No Replay": "gpt2/finetune/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5",
                     "Real Replay": "gpt2/lll/so_t_1_so_t_2_so_t_3_so_t_4_so_t_5_0.2_0.25_6.25e-05_real_improvedgen"},
                "Skewed":
-                   {"Baseline": "2021-02-01-11-18-03/gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
-                    "No Replay": "2021-02-01-11-18-03/gpt2/finetune/so_1_so_2_so_3_so_4_so_5",
+                   {"Baseline": "gpt2/finetune/so_all_1_so_all_2_so_all_3_so_all_4_so_all_5",
+                    "No Replay": "gpt2/finetune/so_1_so_2_so_3_so_4_so_5",
                     "Real Replay": "gpt2/lll/so_1_so_2_so_3_so_4_so_5_0.2_0.25_6.25e-05_real_improvedgen"}
                }
 
