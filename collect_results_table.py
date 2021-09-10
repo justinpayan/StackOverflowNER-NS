@@ -175,13 +175,12 @@ def make_plots_all_tests(r, on_train, ep_type):
                  color=color_map[train_setting],
                  marker='o',
                  label=relabels[train_setting])
-        plt.ylim(ymin=34,ymax=102)
+        plt.ylim(ymin=38,ymax=102)
     if on_train:
         plt.xlabel("Train Episode", fontsize="large")
         plt.xticks(ticks=range(5), labels=[str(i) for i in range(1, 6)])
         plt.ylabel("Train F1", fontsize="large")
         plt.legend(loc="center right", bbox_to_anchor=(1.0, 0.35))
-        plt.ylim(ymin=42)
         plt.savefig("%s_tests_on_train_over_time.png" % ep_type)
     else:
         plt.xlabel("Test Episode", fontsize="large")
@@ -201,8 +200,8 @@ if __name__ == "__main__":
     # make_plots(ep_1_over_time)
     # print(test_on_train_all_eps)
     # make_plots_all_tests(test_on_train_all_eps, True, "Skewed_1")
-    make_plots_all_tests(test_on_train_all_eps, True, "Skewed")
-    make_plots_all_tests(test_on_train_all_eps, True, "Temporal")
+    make_plots_all_tests(test_on_train_all_eps, False, "Skewed")
+    make_plots_all_tests(test_on_train_all_eps, False, "Temporal")
 
     # test_all_eps = {'Temporal': {'Baseline': [52.22, 54.12, 50.75, 48.06, 53.16],
     #                              'No Replay': [52.77, 55.69, 49.85, 47.94, 50.39],
