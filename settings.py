@@ -410,34 +410,34 @@ TASK_DICT = {
                "n_train_epochs": 25
     },
     "so_1": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
-               "n_train_epochs": 25
+               "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_1.json"),
+               "n_train_epochs": 10
     },
     "so_2": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_2.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_2.json"),
                "test": os.path.join(args.data_dir, "so_data",  "skewed_splits", "so_test_2.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_3": {
                "train": os.path.join(args.data_dir, "so_data",  "skewed_splits", "so_train_3.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_3.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_3.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_4": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_4.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_4.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_4.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_5": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_5.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_5.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_5.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_all_1.json"),
