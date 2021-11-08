@@ -37,6 +37,18 @@ Once a model has finished training on all 5 epochs, you should run the `runtest.
 
 Training and testing a baseline model (no CL) follows the same workflow as training the model with CL w/o replay, but you will specify different training episodes in `settings.py` and when calling the train and test scripts.
 
+## Recommended Citation
+
+If you use our data or code, or refer to our paper, please cite our paper using the following bibtex entry:
+
+
+      @inproceedings{payan2021towards,
+          title = {Towards Realistic Single-Task Continuous Learning Research for NER},
+          author = "Payan, Justin and Merhav, Yuval and Xie, He and Krishna, Satyapriya and Ramakrishna, Anil and Sridhar, Mukund and Gupta, Rahul",
+          booktitle = {Findings of the 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+          year = {2021}
+      }
+
 ## Contact
 
 Please contact Justin Payan (`jpayan@umass.edu`) for any questions/comments/discussion about the code or the paper. 
