@@ -63,9 +63,9 @@ def gdumb_sample(rseed, k, split_type):
     label_cts = Counter()
 
     if split_type == "temporal":
-        prefix = "so_temporal_"
+        prefix = os.path.join("temporal_splits", "so_temporal_")
     elif split_type == "skewed":
-        prefix = "so_"
+        prefix = os.path.join("skewed_splits", "so_")
 
     for ep in range(1, 6):
         with open(os.path.join(data_dir, prefix + "train_%d.json" % ep), 'r') as f:
@@ -91,19 +91,21 @@ if __name__ == "__main__":
     args = parse_args()
     if args.split_type == "temporal":
         gdumb_prefix = "gdumb_t_"
-        test_infix = "\"temporal_splits\",  \"so_temporal_\""
+        test_infix = "\"temporal_splits\",  \"so_temporal_"
     elif args.split_type == "skewed":
         gdumb_prefix = "gdumb_"
-        test_infix = "\"skewed_splits\",  \"so_\""
+        test_infix = "\"skewed_splits\",  \"so_"
     else:
         print("split_type must be one of: [temporal, skewed]")
         sys.exit(0)
+
+    os.system("mkdir -p %s" % (os.path.join(data_dir, "gdumb")))
 
     for k in [300, 500, 1000, 1500, 1800]:
         for seed in range(10):
             dset = gdumb_sample(seed, k, args.split_type)
             for i in range(1, 6):
-                with open(os.path.join(data_dir, gdumb_prefix + "%d_%d_%d.json" % (k, seed, i)), 'w') as f:
+                with open(os.path.join(data_dir, "gdumb", gdumb_prefix + "%d_%d_%d.json" % (k, seed, i)), 'w') as f:
                     json.dump(dset, f)
 
     # Use this code to generate the dictionary items that go in settings.py
@@ -112,7 +114,7 @@ if __name__ == "__main__":
             for i in range(1, 6):
                 print("\"" + gdumb_prefix + "%d_%d_%d\": {" % (k, seed, i))
                 print("\t\"train\": os.path.join(args.data_dir, \"so_data\", \"gdumb\", \"" + gdumb_prefix + "%d_%d_%d.json\")," % (k, seed, i))
-                print("\t\"eval\": os.path.join(args.data_dir, \"so_data\", " + test_infix + " + train_test + \"_%d.json\")," % i)
-                print("\t\"test\": os.path.join(args.data_dir, \"so_data\", " + test_infix + " + train_test + \"_%d.json\")," % i)
+                print("\t\"eval\": os.path.join(args.data_dir, \"so_data\", " + test_infix + "test_%d.json\")," % i)
+                print("\t\"test\": os.path.join(args.data_dir, \"so_data\", " + test_infix + "test_%d.json\")," % i)
                 print("\t\"n_train_epochs\": 10")
                 print("},")

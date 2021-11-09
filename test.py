@@ -1,16 +1,11 @@
-import torch
-import csv
 import os
 import json
-import logging
 from fp16 import FP16_Module
-import GPUtil
 from collections import OrderedDict
-from settings import args, MODEL_CLASS, TOKENIZER, SPECIAL_TOKEN_IDS, FILL_VAL, init_logging
-from settings import MEMORY_FACTOR, LEN_FACTOR, TASK_DICT, MODEL_CONFIG, DATA_ATTRS, SPECIAL_TOKENS, CONFIG_CLASS, CONFIG_NAME, LABEL_MAP, INVERSE_LABEL_MAP
-from utils import NERDataset, top_k_top_p_filtering, create_dataloader, logits_to_labels, get_model_dir
-from utils import sample_sequence, remove_id, get_gen_token, lll_unbound_setting
-from metrics import compute_metrics, get_entities_ask_ubuntu
+from settings import TASK_DICT, MODEL_CONFIG, CONFIG_CLASS, CONFIG_NAME, LABEL_MAP, INVERSE_LABEL_MAP
+from utils import NERDataset, create_dataloader, get_model_dir
+from utils import lll_unbound_setting
+from metrics import compute_metrics
 from model import *
 logger = logging.getLogger(__name__)
 
@@ -73,33 +68,10 @@ def test_one_to_one(task_load, task_eval, model, score_dict):
                     cnt += 1
             else:
                 pass
-                # logger.info("ner_X.shape: %s" % str(ner_X.shape))
-                # ner_logits = model(ner_X.cuda())
-                #
-                # next_labels = logits_to_labels(ner_logits).cpu()
-                # logger.info("next_labels: %s" % str(next_labels))
-                # logger.info("next_labels shape: %s" % str(next_labels.shape))
-                #
-                # # TODO: this probably won't work anymore
-                # if args.use_task_in_ner:
-                #     for _idx in range(len(next_labels)):
-                #         next_labels[_idx] = next_labels[_idx][1:]
-                #
-                # for i in range(n_inputs):
-                #     max_tot_lens[cnt] = test_ner_data[cnt][1]
-                #     ner_results[cnt] = next_labels[i, :len_ner_X[i]].tolist()
-                #     cnt += 1
-            # ner_results[cnt] = next_labels
 
     for i in range(len(test_ner_data)):
         original, ner_X, _, Y, _, _, _, _ = test_ner_data[i]
-        # Y = list(filter(lambda x: x != -1, Y))[:-1]  # remove eos not necessary?
-        # Y = ' '.join([str(y) for y in Y]).split(str(SPECIAL_TOKEN_IDS["pad_token"]))
-        # Y = [TOKENIZER.decode(list(map(int, y.split()))) for y in Y]
-        # logger.info("ner_X: %s" % str(TOKENIZER.decode(ner_X)))
-        # Y = [INVERSE_LABEL_MAP[l] for l in Y if l != FILL_VAL]
-        # logger.info("unprocessed result %d: %s" % (i, str(ner_results[i])))
-        # logger.info("unprocessed Y: %s" % str(Y))
+
         if args.ic:
             pred_intent = INVERSE_LABEL_MAP[intents[i]]
             # It's a bit confusing, we have to use Y[idx+1] to know if it's a fill_val, because Y has
@@ -107,12 +79,8 @@ def test_one_to_one(task_load, task_eval, model, score_dict):
             pred = [INVERSE_LABEL_MAP[l] for idx, l in
                     enumerate(ner_results[i]) if idx+1 < len(Y) and Y[idx+1] != FILL_VAL]
 
-            # logger.info("pred: %s" % str(pred))
-
             intent_gold = INVERSE_LABEL_MAP[Y[0]]
             Y = [INVERSE_LABEL_MAP[l] for l in Y[1:] if l != FILL_VAL]
-
-            # logger.info("Y: %s" % str(Y))
 
             intents[i] = [pred_intent, intent_gold]
             ner_results[i] = [original.split(" "), pred, Y]
@@ -121,26 +89,11 @@ def test_one_to_one(task_load, task_eval, model, score_dict):
 
             Y = [INVERSE_LABEL_MAP[l] for l in Y if l != FILL_VAL]
             ner_results[i] = [original.split(" "), pred, Y]
-        # logger.info("\n")
-        # logger.info("result: %s" % str(ner_results[i]))
-        # logger.info("len(orig): %d\nlen(pred): %d\nlen(y): %d" % (len(ner_results[i][0]),
-        #                                                           len(ner_results[i][1]),
-        #                                                           len(ner_results[i][2])))
-        # logger.info("TOKENIZER.decode(ner_results[i]): %s" % str(TOKENIZER.decode(ner_results[i].tolist())))
-        # ner_results[i] = [TOKENIZER.decode(ner_results[i].tolist()), Y]
 
-
-
-
-
-    # get_test_score(task_eval, ner_results, score_dict)
-
-    # logger.info("score dict: %s" % str(score_dict))
     model_dir = model.model_dir
-    # ep = model.ep
     conll_score_in_file = os.path.join(model_dir, "ner_conll_score_in_{}_{}".format(task_eval, "finish"))
 
-    if task_eval in ['conll_eng', 'wnut', 'wnut_O'] or task_eval.startswith("so"):
+    if task_eval in ['conll_eng', 'wnut', 'wnut_O'] or task_eval.startswith("so") or task_eval.startswith("gdumb"):
         with open(conll_score_in_file, 'w') as f:
             for original, pred, _y in ner_results:
                 for o, p, y in zip(original, pred, _y):
@@ -197,10 +150,6 @@ def test_one_to_many(task_load, already_tested):
         model_path = os.path.join(model_dir, 'model-{}'.format("finish"))
         config_path = os.path.join(model_dir, CONFIG_NAME)
 
-        # gen_token = get_gen_token(task_load)
-        # TOKENIZER.add_tokens([gen_token])
-        # SPECIAL_TOKENS[task_load] = gen_token
-        # SPECIAL_TOKEN_IDS[task_load] = TOKENIZER.convert_tokens_to_ids(gen_token)
         model_config = CONFIG_CLASS.from_json_file(config_path)
         lang_model = MODEL_CLASS(model_config).cuda().eval()
         state_dict = torch.load(model_path, map_location='cuda:0')
@@ -227,10 +176,6 @@ def test_one_to_many(task_load, already_tested):
             model_path = os.path.join(model_dir, 'model-{}'.format(ep+1))
             config_path = os.path.join(model_dir, CONFIG_NAME)
 
-            # gen_token = get_gen_token(task_load)
-            # TOKENIZER.add_tokens([gen_token])
-            # SPECIAL_TOKENS[task_load] = gen_token
-            # SPECIAL_TOKEN_IDS[task_load] = TOKENIZER.convert_tokens_to_ids(gen_token)
             model_config = CONFIG_CLASS.from_json_file(config_path)
             lang_model = MODEL_CLASS(model_config).cuda().eval()
             state_dict = torch.load(model_path, map_location='cuda:0')
@@ -258,9 +203,6 @@ def test_one_to_many(task_load, already_tested):
 if __name__ == '__main__':
     if args.n_gpus > 1:
         raise NotImplementedError("test can be run with only one gpu currently!")
-    
-    # if args.model_name == "gpt2":
-    #     args.fp32 = False  # always use fp16 in testing
 
     if not args.debug:
         logging.getLogger("pytorch_transformers").setLevel(logging.WARNING)

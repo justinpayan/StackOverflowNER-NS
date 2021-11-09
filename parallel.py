@@ -117,13 +117,10 @@ def execute_replication_callbacks(modules):
     """
     Execute an replication callback `__data_parallel_replicate__` on each module created
     by original replication.
-
     The callback will be invoked with arguments `__data_parallel_replicate__(ctx, copy_id)`
-
     Note that, as all modules are isomorphism, we assign each sub-module with a context
     (shared among multiple copies of this module on different devices).
     Through this context, different copies can share some information.
-
     We guarantee that the callback on the master copy (the first copy) will be called ahead
     of calling the callback of any slave copies.
     """

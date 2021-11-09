@@ -6,8 +6,8 @@ import datetime
 logger = logging.getLogger(__name__)
 
 import GPUtil
-from pytorch_transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
-from pytorch_transformers import GPT2Model, GPT2Tokenizer, GPT2Config, CONFIG_NAME
+# from transformers import OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig
+from transformers import GPT2Model, GPT2Tokenizer, GPT2Config, CONFIG_NAME
 import torch
 
 import pathlib
@@ -27,7 +27,7 @@ MEMORY_FACTOR = {
 TURING_ARCHS = {'Tesla V100', '2080 Ti'}
 MODEL_CLASSES = {
     'gpt2': (GPT2Model, GPT2Tokenizer, GPT2Config),
-    'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
+    # 'openai-gpt': (OpenAIGPTLMHeadModel, OpenAIGPTTokenizer, OpenAIGPTConfig),
 }
 SAVE_NAME = 'model-'
 FINAL_SAVE_NAME = 'model-finish'
@@ -115,7 +115,9 @@ def parse_args():
     elif args.seq_train_type == "lll":
         args.model_dir_root += "_improvedgen"
 
-    args.device_ids = GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus)
+    # args.device_ids = GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus)
+    args.device_ids = [0]
+    # print(args.device_ids)
     if not args.browsing and len(args.device_ids) == 0:
         logger.error('No available GPUs!')
         raise NotImplementedError("No CPU mode available!")
@@ -128,7 +130,7 @@ def parse_args():
     if not args.browsing:
         print(args.device_num)
         print(GPUtil.getAvailable(maxLoad=0.05, maxMemory=0.05, limit=args.n_gpus))
-        torch.cuda.set_device(args.device_ids[args.device_num])
+        # torch.cuda.set_device(args.device_ids[args.device_num])
 
         gpus = GPUtil.getGPUs()
         # gpu_names = [gpus[device_id].name for device_id in args.device_ids]
@@ -158,11 +160,11 @@ def parse_args():
         special_tokens["ic"] = '__intent__'
 
     model_class, tokenizer_class, config_class = MODEL_CLASSES[args.model_name]
-    tokenizer = tokenizer_class.from_pretrained(os.path.join(args.model_base_dir, args.model_name))
+    tokenizer = tokenizer_class.from_pretrained(args.model_name)
     tokenizer.add_tokens(list(special_tokens.values()))
     special_token_ids = {k:tokenizer.convert_tokens_to_ids(v) for k,v in special_tokens.items()}
 
-    model_config = config_class.from_pretrained(os.path.join(args.model_base_dir, args.model_name))
+    model_config = config_class.from_pretrained(args.model_name)
     model_config.vocab_size = len(tokenizer)
     tokens_weight = torch.ones([model_config.vocab_size], dtype=torch.float).cuda()
     tokens_weight[special_token_ids["ans_token"]] = args.tokens_weight
@@ -410,34 +412,34 @@ TASK_DICT = {
                "n_train_epochs": 25
     },
     "so_1": {
-               "train": os.path.join(args.data_dir, "so_data", "so_train_1.json"),
-               "eval": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
-               "test": os.path.join(args.data_dir, "so_data", "so_test_1.json"),
-               "n_train_epochs": 25
+               "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_1.json"),
+               "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_1.json"),
+               "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_1.json"),
+               "n_train_epochs": 10
     },
     "so_2": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_2.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_2.json"),
                "test": os.path.join(args.data_dir, "so_data",  "skewed_splits", "so_test_2.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_3": {
                "train": os.path.join(args.data_dir, "so_data",  "skewed_splits", "so_train_3.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_3.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_3.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_4": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_4.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_4.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_4.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_5": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_5.json"),
                "eval": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_5.json"),
                "test": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_test_5.json"),
-               "n_train_epochs": 25
+               "n_train_epochs": 10
     },
     "so_all_1": {
                "train": os.path.join(args.data_dir, "so_data", "skewed_splits", "so_train_all_1.json"),

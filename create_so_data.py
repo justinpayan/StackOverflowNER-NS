@@ -394,7 +394,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
 
     # Save the train data
     for idx, split in enumerate(train_splits):
-        with open(os.path.join(out_dir, "so_%d_train_%d.json" % (c, idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_train_%d.json" % (idx + 1)), 'w') as f:
             json.dump(sorted(split, key=lambda x: int(x["id"])), f)
 
     # Save all the train data together, for running the baseline
@@ -405,7 +405,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     for split in train_splits:
         train_data.extend(split)
     for idx in range(len(train_splits)):
-        with open(os.path.join(out_dir, "so_%d_train_all_%d.json" % (c, idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_train_all_%d.json" % (idx + 1)), 'w') as f:
             json.dump(sorted(train_data, key=lambda x: int(x["id"])), f)
 
     # Sample the test data according to a slightly perturbed version of the training data
@@ -419,7 +419,7 @@ def construct_skewed_dataset(labeled_data_files, out_dir, label_set, start_id, s
     test_splits = create_splits(entity_types_to_json_elts_test, entity_distribs, sorted_entities, total_size)
 
     for idx, split in enumerate(test_splits):
-        with open(os.path.join(out_dir, "so_%d_test_%d.json" % (c, idx + 1)), 'w') as f:
+        with open(os.path.join(out_dir, "so_test_%d.json" % (idx + 1)), 'w') as f:
             json.dump(split, f)
 
     return curr_id, sentence_ct, skipped_annotated, label_set
@@ -553,6 +553,9 @@ if __name__ == "__main__":
     random.seed(31415)
     np_gen = np.random.default_rng(seed=31415)
     np.random.seed(31415)
+
+    os.system("mkdir -p %s" % (os.path.join(args.json_dir, "skewed_splits")))
+    os.system("mkdir -p %s" % (os.path.join(args.json_dir, "temporal_splits")))
 
     if args.split_type == "both":
         create_all_datasets(args.labeled_data_dir, args.json_dir, args.c, np_gen)

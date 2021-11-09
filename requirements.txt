@@ -1,3 +1,11 @@
-GPUtil==1.4.0
-pytorch-transformers==1.2.0
-torch>=1.2.0
+
+matplotlib=3.4.3
+nltk=3.6.5
+numpy=1.19.2
+python-levenshtein=0.12.2
+pytorch=1.8.1
+pytorch-transformers=1.2.0
+scipy=1.6.2
+sentencepiece=0.1.96
+tqdm=4.62.1
+transformers=2.1.1
